@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="400dp" />
+        app:layout_constraintHeight_min="700dp" />
 
     <!-- Comments header TextView -->
     <TextView
@@ -28,11 +28,6 @@
         app:layout_constraintStart_toStartOf="parent" /> <!-- Left alignment -->
 
     <!-- RecyclerView taking 50% of screen height -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/commentsHeader"
-        app:layout_constraintHeight_percent="0.5" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

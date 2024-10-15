@@ -3,6 +3,7 @@ package com.kaway.epic.ytservice;
 import android.os.AsyncTask;
 
 import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.CommentThread;
 import com.google.api.services.youtube.model.CommentThreadListResponse;
 import com.kaway.epic.beans.Comment;
 
@@ -14,9 +15,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,10 +35,10 @@ public class YTComments {
 
 
 
-    private void executeCommentsAPI(ExecutorService executor) {
-        executor.submit(new Callable() {
+    private CommentThreadListResponse executeCommentsAPI(ExecutorService executor) throws ExecutionException, InterruptedException {
+        Future<CommentThreadListResponse> future = executor.submit(new Callable<CommentThreadListResponse>() {
             @Override
-            public Object call() throws Exception {
+            public CommentThreadListResponse call() throws Exception {
                 NetHttpTransport httpTransport = new com.google.api.client.http.javanet.NetHttpTransport();
                 YouTube youtubeService = new YouTube.Builder(httpTransport, JSON_FACTORY, null)
                         .setApplicationName(APPLICATION_NAME)
@@ -44,14 +48,15 @@ public class YTComments {
                 CommentThreadListResponse response = request.setKey(DEVELOPER_KEY)
                         .setVideoId("e3yEg15PcGQ")
                         .execute();
-                System.out.println("Comments Thread Response is");
-                System.out.println(response);
 
-                return new Object();
+
+                return response;
             }
-
-
         });
+
+        System.out.println("Comments Thread Response is++");
+        System.out.println(future.get());
+        return future.get();
     }
 
     private String performNetworkOperation() {
@@ -76,7 +81,10 @@ public class YTComments {
     public void getComments(String videoId) {
         try {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executeCommentsAPI(executorService);
+            CommentThreadListResponse commentThreadListResponse = executeCommentsAPI(executorService);
+            List<CommentThread> commentThreads = commentThreadListResponse.getItems();
+
+
         }catch(Exception e){
             System.out.println("couldnt retrieve comments");
             logger.log(Level.SEVERE, "An exception occurred: ", e);

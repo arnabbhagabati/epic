@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -59,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setDomStorageEnabled(true);
-            webView.loadData(frameVideo, "text/html", "utf-8");
+            webView.setWebChromeClient(new WebChromeClient());
+            webView.loadUrl(youTubeUrl);
+            //webView.loadData(frameVideo, "text/html", "utf-8");
 
 
         } else {
@@ -68,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         new YTComments().getComments(videoId);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Example comments with replies
         List<Reply> replies1 = new ArrayList<>();
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         comments.add(new Comment(2, "Commenter 2", "This is the second comment.", replies2));
 
         // Set up the adapter
-        CommentAdapter adapter = new CommentAdapter(this, comments);
-        recyclerView.setAdapter(adapter);
+        //CommentAdapter adapter = new CommentAdapter(this, comments);
+        //recyclerView.setAdapter(adapter);
     }
 }
