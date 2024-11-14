@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.kaway.epic.androidcomponents.CommentAdapter;
 import com.kaway.epic.beans.Comment;
+import com.kaway.epic.beans.EpicWebViewCLient;
 import com.kaway.epic.beans.Reply;
 import com.kaway.epic.ytservice.YTComments;
 
@@ -31,12 +32,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
-    String videoId = "e3yEg15PcGQ";
+    String videoId = "D9-voINFkCg";
     String youTubeUrl = "https://www.youtube.com/embed/"+videoId;
 
-    String frameVideo = "<html><body><iframe width=\"370\" height=\"380\" " +
-            "src='" + youTubeUrl + "' frameborder=\"0\" allowfullscreen>" +
-            "</iframe></body></html>";
+    String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -45,24 +44,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.mediaPlayerView);
+        webView.setWebViewClient(new EpicWebViewCLient());
 
         String regexYoutUbe = "^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+";
         if (youTubeUrl.matches(regexYoutUbe)) {
 
             //setting web client
-            webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    return false;
-                }
-            });
+
             //web settings for JavaScript Mode
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setDomStorageEnabled(true);
             webView.setWebChromeClient(new WebChromeClient());
             webView.loadUrl(youTubeUrl);
-            //webView.loadData(frameVideo, "text/html", "utf-8");
+            //webView.loadDataWithBaseURL("https://www.youtube.com", frameVideo, "text/html", "UTF-8", null);
+
+
 
 
         } else {
@@ -89,5 +86,15 @@ public class MainActivity extends AppCompatActivity {
         // Set up the adapter
         //CommentAdapter adapter = new CommentAdapter(this, comments);
         //recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Check if WebView has back history
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

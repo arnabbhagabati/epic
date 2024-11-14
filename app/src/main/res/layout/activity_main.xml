@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="700dp" />
+        app:layout_constraintHeight_min="500dp" />
 
     <!-- Comments header TextView -->
     <TextView
