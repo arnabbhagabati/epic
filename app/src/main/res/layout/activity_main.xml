@@ -2,7 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray">
 
     <!-- WebView taking 40% of screen height -->
     <WebView
@@ -15,19 +16,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_min="500dp" />
 
-    <!-- Comments header TextView -->
+    <!-- Description detail TextView without header -->
     <TextView
-        android:id="@+id/commentsHeader"
-        android:layout_width="wrap_content"
+        android:id="@+id/descriptionDetail"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/comments"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:padding="5dp"
+        android:text="This is a detailed description of the video content, providing context and additional information."
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:padding="8dp"
+        android:fontFamily="sans-serif"
         app:layout_constraintTop_toBottomOf="@id/mediaPlayerView"
-        app:layout_constraintStart_toStartOf="parent" /> <!-- Left alignment -->
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- RecyclerView taking 50% of screen height -->
-
+    <!-- RecyclerView taking 50% of screen height, replace commentsHeader with RecyclerView constraint -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/commentsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/descriptionDetail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
