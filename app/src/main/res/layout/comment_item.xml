@@ -11,12 +11,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
+        android:textColor="@android:color/white"
         android:text="Comment Author" />
 
     <TextView
         android:id="@+id/comment_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
         android:text="Comment text here" />
 
     <!-- Replies section -->
