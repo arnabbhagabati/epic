@@ -31,4 +31,12 @@ public class EpicWebViewCLient extends WebViewClient{
         // backButton.setEnabled(canGoBack);
         // forwardButton.setEnabled(canGoForward);
     }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        System.out.println("onPageFinished called");
+        view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");
+    }
+
+
 }
