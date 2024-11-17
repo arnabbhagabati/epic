@@ -54,8 +54,8 @@ public class FullCommentAdapter extends RecyclerView.Adapter<FullCommentAdapter.
         // Inflate and add reply views dynamically
         for (Reply reply : comment.getReplies()) {
             View replyView = LayoutInflater.from(context).inflate(R.layout.comment_reply, holder.repliesContainer, false);
-            TextView replyAuthor = replyView.findViewById(R.id.reply_author);
-            TextView replyText = replyView.findViewById(R.id.reply_text);
+            TextView replyAuthor = replyView.findViewById(R.id.replierName);
+            TextView replyText = replyView.findViewById(R.id.replyText);
 
             replyAuthor.setText(reply.getAuthor());
             replyText.setText(reply.getText());

@@ -14,15 +14,14 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.kaway.epic.androidcomponents.FullCommentAdapter;
-import com.kaway.epic.beans.Comment;
+
+
 import com.kaway.epic.beans.EpicWebViewCLient;
-import com.kaway.epic.beans.Reply;
+
 import com.kaway.epic.screenLayoutUtils.ShowComments;
 import com.kaway.epic.ytservice.YTComments;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 

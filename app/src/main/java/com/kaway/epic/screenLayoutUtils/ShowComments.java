@@ -33,11 +33,11 @@ public class ShowComments {
 
         List<Reply> replies2 = new ArrayList<>();
         replies2.add(new Reply(3, "User C", "Yet another reply."));
-        replies2.add(new Reply(3, "User B", "Yet another reply...."));
+        replies2.add(new Reply(3, "User B", "Yet another reply..... This is the second comment.This is a comment text that can span multiple lines.This is a comment text that can span multiple lines."));
 
         List<Comment> comments = new ArrayList<>();
         comments.add(new Comment(1, "Commenter 1", "This is the first comment.", replies1));
-        comments.add(new Comment(2, "Commenter 2", "This is the second comment.", replies2));
+        comments.add(new Comment(2, "Commenter 2", "This is the second comment.This is a comment text that can span multiple lines.This is a comment text that can span multiple lines.", replies2));
 
         //Set up the adapter
         InitialCommentAdapter adapter = new InitialCommentAdapter(context, comments);
@@ -59,7 +59,7 @@ public class ShowComments {
 
         List<Comment> comments = new ArrayList<>();
         comments.add(new Comment(1, "Commenter 1", "This is the first comment.", replies1));
-        comments.add(new Comment(2, "Commenter 2", "This is the second comment.", replies2));
+        comments.add(new Comment(2, "Commenter 2", "This is the second comment.This is a comment text that can span multiple lines.This is a comment text that can span multiple lines.", replies2));
 
         //Set up the adapter
         FullCommentAdapter adapter = new FullCommentAdapter(context, comments);

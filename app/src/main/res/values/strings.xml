@@ -3,7 +3,7 @@
     <string name="comments">Comments</string>
     commenter_icon
     <string name="commenter_icon">Commenter icon</string>
-    <string name="this_is_a_comment_text_that_can_span_multiple_lines">This is a comment text that can span multiple lines.</string>
+    <string name="long_comment">This is a comment text that can span multiple lines.This is a comment text that can span multiple lines.</string>
     <string name="view_replies">View replies</string>
     <string name="hide_replies">Hide replies</string>
 </resources>

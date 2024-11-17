@@ -61,11 +61,19 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
                 if(viewMoreReplies.getText().toString().equals(context.getString(R.string.view_replies))) {
                     for(Reply reply : comment.getReplies()){
                         View replyView = LayoutInflater.from(context).inflate(R.layout.comment_reply, holder.repliesContainer, false);
-                        TextView replyAuthor = replyView.findViewById(R.id.reply_author);
-                        TextView replyText = replyView.findViewById(R.id.reply_text);
+                        TextView replyAuthor = replyView.findViewById(R.id.replierName);
+                        TextView replyText = replyView.findViewById(R.id.replyText);
 
                         replyAuthor.setText(reply.getAuthor());
                         replyText.setText(reply.getText());
+
+                        ImageView replyProfileIcon = replyView.findViewById(R.id.replyProfileIcon);
+                        String imgUrl = "https://yt3.googleusercontent.com/ytc/AIdro_mjQsGOg2LoAg2kibV_XcmafRnjoY_WsvTla0GeydUGhnU=s900-c-k-c0x00ffffff-no-rj";
+
+                        Glide.with(context)
+                                .load(imgUrl)
+                                .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)
+                                .into(replyProfileIcon);
 
                         holder.repliesContainer.addView(replyView);
                     }
