@@ -4,24 +4,26 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.kaway.epic.R;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
 
 import java.util.List;
 
-public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
+public class FullCommentAdapter extends RecyclerView.Adapter<FullCommentAdapter.CommentViewHolder> {
 
     private Context context;
     private List<Comment> comments;
 
-    public CommentAdapter(Context context, List<Comment> comments) {
+    public FullCommentAdapter(Context context, List<Comment> comments) {
         this.context = context;
         this.comments = comments;
     }
@@ -38,7 +40,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         Comment comment = comments.get(position);
         holder.commentAuthor.setText(comment.getAuthor());
         holder.commentText.setText(comment.getText());
+        String imgUrl = "https://yt3.ggpht.com/GNO2Zd94dZUUwdbrpEgXfH5wqv3O61YG3IhR5iQ_nb-iPOJ0Ws2f1gYUz58j133XXtPbQ3Jr=s48-c-k-c0x00ffffff-no-rj";
 
+        Glide.with(context)
+                .load(imgUrl)
+                .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)
+                .into(holder.commenterProfilePic);
+
+        holder.commenterProfilePic.setBackgroundResource(R.drawable.circular_background);
         // Clear any previous replies in the container
         holder.repliesContainer.removeAllViews();
 
@@ -61,12 +70,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
     static class CommentViewHolder extends RecyclerView.ViewHolder {
+        ImageView commenterProfilePic;
         TextView commentAuthor;
         TextView commentText;
         LinearLayout repliesContainer;
 
         CommentViewHolder(@NonNull View itemView) {
             super(itemView);
+            commenterProfilePic = itemView.findViewById(R.id.commentProfileIcon);
             commentAuthor = itemView.findViewById(R.id.commenterName);
             commentText = itemView.findViewById(R.id.commentText);
             repliesContainer = itemView.findViewById(R.id.replies_container);

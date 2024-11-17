@@ -8,7 +8,7 @@
 
     <!-- Profile Icon with 4dp padding on top -->
     <ImageView
-        android:id="@+id/profileIcon"
+        android:id="@+id/commentProfileIcon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="top"
@@ -27,17 +27,35 @@
         android:orientation="vertical"
         android:layout_weight="1">
 
-        <!-- Commenter's Name -->
-        <TextView
-            android:id="@+id/commenterName"
+        <!-- Commenter's Name (Split into Two TextViews) -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Commenter Name"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:ellipsize="end"
-            android:maxLines="1" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/commenterName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Commenter Name"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+            <TextView
+                android:id="@+id/commenterNameLightGrey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" · 2 hours ago"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="normal"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
 
         <!-- Comment Text -->
         <TextView
@@ -56,8 +74,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="16dp"
-            android:paddingTop="8dp">
-        </LinearLayout>
-
+            android:paddingTop="8dp" />
     </LinearLayout>
 </LinearLayout>
