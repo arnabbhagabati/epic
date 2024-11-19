@@ -2,16 +2,6 @@ package com.kaway.epic.ytservice;
 
 import android.os.AsyncTask;
 
-import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.CommentThread;
-import com.google.api.services.youtube.model.CommentThreadListResponse;
-import com.kaway.epic.beans.Comment;
-
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -30,11 +20,11 @@ public class YTComments {
     private static final String DEVELOPER_KEY = "AIzaSyCj2csNua3EbkajBXlhfCAImkrAldOoFss";
 
     private static final String APPLICATION_NAME = "API code samples";
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    //private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     Logger logger = Logger.getLogger(this.getClass().getName());
 
 
-
+    /*
     private CommentThreadListResponse executeCommentsAPI(ExecutorService executor) throws ExecutionException, InterruptedException {
         Future<CommentThreadListResponse> future = executor.submit(new Callable<CommentThreadListResponse>() {
             @Override
@@ -90,4 +80,5 @@ public class YTComments {
             logger.log(Level.SEVERE, "An exception occurred: ", e);
         }
     }
+    */
 }

@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kaway.epic.R;
 import com.kaway.epic.androidcomponents.FullCommentAdapter;
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;

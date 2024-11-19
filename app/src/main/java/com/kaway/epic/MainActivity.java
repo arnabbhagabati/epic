@@ -1,12 +1,19 @@
 package com.kaway.epic;
 
+import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID;
+import static com.kaway.epic.EpicConstants.DEFAULT_YT;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -14,12 +21,20 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-
-
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
+import com.amplifyframework.core.Amplify;
 import com.kaway.epic.beans.EpicWebViewCLient;
 
 import com.kaway.epic.screenLayoutUtils.ShowComments;
+import com.kaway.epic.ytservice.VidService;
 import com.kaway.epic.ytservice.YTComments;
+import com.amazonaws.regions.Regions;
+
+
+import java.util.List;
+import java.util.Set;
 
 
 
@@ -27,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     RecyclerView recyclerView;
-    String videoId = "54zE3WRyxBc";
+    String videoId = "5V5rySkTqQE";
     String youTubeUrl = "https://www.youtube.com/embed/"+videoId+"?rel=0&autoplay=1";
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
@@ -37,11 +52,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setStringFromSharedPrefs();
+
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.mediaPlayerView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebChromeClient(new MyChrome());
         webView.setWebViewClient(new EpicWebViewCLient());
+
+        String s2 = "some string arn  is bad ";
+        List<String> vidIds = new VidService().getVidIDs(this);
+
+        int randomIdx = (int) Math.floor(Math.random()*vidIds.size());
+
+        videoId = vidIds.get(randomIdx);
+        youTubeUrl = "https://www.youtube.com/embed/"+videoId+"?rel=0&autoplay=1";
+
+        setStringFromSharedPrefs();
 
         String regexYoutUbe = "^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+";
         if (youTubeUrl.matches(regexYoutUbe)) {
@@ -63,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
 
-        new YTComments().getComments(videoId);
         recyclerView = findViewById(R.id.commentsRecyclerView);
         new ShowComments(this).showInitialComments(recyclerView);
 
@@ -115,4 +141,16 @@ public class MainActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
     }
+
+    private void setStringFromSharedPrefs(){
+        SharedPreferences preferences = this.getSharedPreferences(this.getPackageName(), Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("YouTube_Tag",DEFAULT_YT);
+        editor.putString("Video_Id",DEFAULT_VID_ID);
+        editor.apply();
+    }
+
+
+
+
 }
