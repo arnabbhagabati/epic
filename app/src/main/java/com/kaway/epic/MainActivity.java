@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStringFromSharedPrefs();
 
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.mediaPlayerView);
@@ -68,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         videoId = vidIds.get(randomIdx);
         youTubeUrl = "https://www.youtube.com/embed/"+videoId+"?rel=0&autoplay=1";
 
-        setStringFromSharedPrefs();
 
         String regexYoutUbe = "^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+";
         if (youTubeUrl.matches(regexYoutUbe)) {
@@ -141,16 +139,5 @@ public class MainActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
     }
-
-    private void setStringFromSharedPrefs(){
-        SharedPreferences preferences = this.getSharedPreferences(this.getPackageName(), Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("YouTube_Tag",DEFAULT_YT);
-        editor.putString("Video_Id",DEFAULT_VID_ID);
-        editor.apply();
-    }
-
-
-
 
 }

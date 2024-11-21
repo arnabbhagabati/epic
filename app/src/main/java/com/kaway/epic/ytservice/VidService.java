@@ -3,7 +3,9 @@ package com.kaway.epic.ytservice;
 import android.content.Context;
 
 import com.kaway.epic.db.AwsDynDbConfig;
+import com.kaway.epic.db.EpicDbDao;
 
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ public class VidService {
     //ToDo : Store this in a DB first
     public List<String> getVidIDs(Context context){
         List<String> funVidIds = new ArrayList<>();
+        JSONArray op = new JSONArray();
 
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -32,6 +35,10 @@ public class VidService {
 
         try {
             funVidIds = funFuture.get();
+            EpicDbDao epicDbDao = new EpicDbDao(context);
+            epicDbDao.insertVidList(1L,funVidIds);
+            op= epicDbDao.getViIdList(1L);
+            LOG.info(op.toString());
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {

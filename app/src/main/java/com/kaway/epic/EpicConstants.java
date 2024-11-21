@@ -9,4 +9,8 @@ public class EpicConstants {
 
     public static String DEFAULT_YT = "VABA4";
     public static String DEFAULT_VID_ID = "WFcs3+j9OL";
+
+    public static String EPIC_TABLE_NAME  = "VID_ID_LIST";
+
+    public static String EPIC_LOG_TAG  = "epic.log";
 }
