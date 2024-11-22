@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-public class AwsDynDbConfig implements Callable<List<String>> {
+public class AwsDynDbConfig {
 
     Context context;
 
@@ -29,7 +29,11 @@ public class AwsDynDbConfig implements Callable<List<String>> {
         this.context = context;
     }
 
-    @Override
+    public AwsDynDbConfig() {
+
+    }
+
+
     public List<String> call() throws Exception {
         List<String> op = new ArrayList<>();
         CognitoCredentialsProvider credentialsProvider = new CognitoCredentialsProvider(
@@ -45,6 +49,15 @@ public class AwsDynDbConfig implements Callable<List<String>> {
 
         op = getVidListTableItem(dbClient,"id","1","funVidList");
         return op;
+    }
+
+    public AmazonDynamoDBClient getDBClient(){
+        CognitoCredentialsProvider credentialsProvider = new CognitoCredentialsProvider(
+                "us-west-2:cbb3044b-20dd-41cd-a93d-3152a0c57119", US_WEST_2);
+        AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(credentialsProvider);
+        dbClient.setRegion(Region.getRegion(US_WEST_2));
+
+        return dbClient;
     }
 
 

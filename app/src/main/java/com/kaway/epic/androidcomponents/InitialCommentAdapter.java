@@ -1,5 +1,9 @@
 package com.kaway.epic.androidcomponents;
 
+import static com.kaway.epic.EpicConstants.VID_KEY_0;
+import static com.kaway.epic.EpicConstants.VID_KEY_1;
+import static com.kaway.epic.EpicConstants.VID_KEY_2;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +19,10 @@ import com.bumptech.glide.Glide;
 import com.kaway.epic.R;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
+import com.kaway.epic.util.EpicUtils;
 
 import java.util.List;
+import java.util.Set;
 
 public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentAdapter.CommentViewHolder>{
 
@@ -69,6 +75,10 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
 
                         ImageView replyProfileIcon = replyView.findViewById(R.id.replyProfileIcon);
                         String imgUrl = "https://yt3.googleusercontent.com/ytc/AIdro_mjQsGOg2LoAg2kibV_XcmafRnjoY_WsvTla0GeydUGhnU=s900-c-k-c0x00ffffff-no-rj";
+
+                        Set<String> vidSet0 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_0);
+                        Set<String> vidSet1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
+                        Set<String> vidSet2 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_2);
 
                         Glide.with(context)
                                 .load(imgUrl)

@@ -1,11 +1,9 @@
 package com.kaway.epic;
 
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID;
-import static com.kaway.epic.EpicConstants.DEFAULT_YT;
+import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
+import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
+import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,21 +19,19 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
-import com.amplifyframework.core.Amplify;
 import com.kaway.epic.beans.EpicWebViewCLient;
 
 import com.kaway.epic.screenLayoutUtils.ShowComments;
+import com.kaway.epic.util.EpicUtils;
+import com.kaway.epic.util.VidListUtil;
 import com.kaway.epic.ytservice.VidService;
-import com.kaway.epic.ytservice.YTComments;
-import com.amazonaws.regions.Regions;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -59,12 +55,21 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebChromeClient(new MyChrome());
         webView.setWebViewClient(new EpicWebViewCLient());
 
-        String s2 = "some string arn  is bad ";
-        List<String> vidIds = new VidService().getVidIDs(this);
+        if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
+            //This is first launch
+            VidListUtil vidListUtil = new VidListUtil();
+            vidListUtil.loadThreeVidKeys(this);
+            List<String> vidList = new ArrayList<>();
+            vidList.addAll(DEFAULT_VID_ID_SET);
 
-        int randomIdx = (int) Math.floor(Math.random()*vidIds.size());
+            Random random = new Random();
+            String vidId = vidList.get(random.nextInt(vidList.size()));
+            videoId = vidId;
+            vidList.remove(vidId);
+            EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,new HashSet<>(vidList));
+        }
 
-        videoId = vidIds.get(randomIdx);
+        Log.i("Showing vidid {}",videoId);
         youTubeUrl = "https://www.youtube.com/embed/"+videoId+"?rel=0&autoplay=1";
 
 

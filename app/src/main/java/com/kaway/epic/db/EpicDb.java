@@ -13,7 +13,7 @@ public class EpicDb  extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME = "epic.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public static String VID_LIST_ID_COL ="VID_LIST_ID";
     public static String VID_LIST_COL ="VID_LIST";
