@@ -2,16 +2,22 @@ package com.kaway.epic;
 
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
+import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
 import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
+import static com.kaway.epic.EpicConstants.VID_KEY_0;
+import static com.kaway.epic.EpicConstants.VID_KEY_3;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -38,64 +44,60 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     RecyclerView recyclerView;
-    String videoId = "5V5rySkTqQE";
-    String youTubeUrl = "https://www.youtube.com/embed/"+videoId+"?rel=0&autoplay=1";
+    private GestureDetector gestureDetector;
+    Set<String> currVidSet = new HashSet<>();
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.mediaPlayerView);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebChromeClient(new MyChrome());
-        webView.setWebViewClient(new EpicWebViewCLient());
+        ConstraintLayout constraintLayout = findViewById(R.id.rootLayout);
+        recyclerView = findViewById(R.id.commentsRecyclerView);
 
+        String videoId = "PmvsAi89BDM";
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
             //This is first launch
             VidListUtil vidListUtil = new VidListUtil();
-            vidListUtil.loadThreeVidKeys(this);
-            List<String> vidList = new ArrayList<>();
-            vidList.addAll(DEFAULT_VID_ID_SET);
-
-            Random random = new Random();
-            String vidId = vidList.get(random.nextInt(vidList.size()));
-            videoId = vidId;
-            vidList.remove(vidId);
-            EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,new HashSet<>(vidList));
+            vidListUtil.loadThreeVidKeys(this,currVidSet);
+            Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
+            videoId = EpicUtils.extractRandomString(defaultVidSet);
+            EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+        }else{
+            currVidSet = new VidListUtil().getNextVidSet(this);
+            if(!currVidSet.isEmpty()){
+               videoId = EpicUtils.extractRandomString(currVidSet);
+            }else{
+               Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
+               videoId = EpicUtils.extractRandomString(defaultVidSet);
+               EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+            }
         }
 
-        Log.i("Showing vidid {}",videoId);
-        youTubeUrl = "https://www.youtube.com/embed/"+videoId+"?rel=0&autoplay=1";
+        Log.i(EPIC_LOG_TAG , "Showing vidid "+videoId);
 
 
-        String regexYoutUbe = "^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+";
-        if (youTubeUrl.matches(regexYoutUbe)) {
+        gestureDetector = new GestureDetector(this, new GestureListener());
+        webView.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return false;
+        });
+        recyclerView.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return false;
+        });
+        constraintLayout.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return false;
+        });
 
-            //setting web client
-
-            //web settings for JavaScript Mode
-            WebSettings webSettings = webView.getSettings();
-            webSettings.setJavaScriptEnabled(true);
-            webSettings.setDomStorageEnabled(true);
-            webView.loadUrl(youTubeUrl);
-            //webView.loadDataWithBaseURL("https://www.youtube.com", frame2, "text/html", "UTF-8", null);
-
-
-
-
-        } else {
-            Toast.makeText(MainActivity.this, "This is other video",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        recyclerView = findViewById(R.id.commentsRecyclerView);
-        new ShowComments(this).showInitialComments(recyclerView);
-
+        initializeWebView(EpicUtils.getEmbedUrl(videoId));
+        initializeRecyclerView();
     }
 
     @Override
@@ -144,5 +146,90 @@ public class MainActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
     }
+
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final int SWIPE_THRESHOLD = 50;  // Minimum distance for a swipe
+        private static final int SWIPE_VELOCITY_THRESHOLD = 50;  // Minimum velocity for a swipe
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float diffX = e2.getX() - e1.getX();
+            float diffY = e2.getY() - e1.getY();
+
+            if (Math.abs(diffX) > Math.abs(diffY)) { // Check if horizontal swipe
+                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffX > 0) {
+                        onSwipeRight();
+                    } else {
+                        onSwipeLeft();
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private void onSwipeRight() {
+        // Action for right swipe
+        System.out.println("Swiped Right!");
+        reloadMediaPlayerView();
+    }
+
+    private void onSwipeLeft() {
+        // Action for left swipe
+        System.out.println("Swiped Left!");
+        reloadMediaPlayerView();
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void initializeWebView(String vidUrl) {
+        webView.setWebChromeClient(new MyChrome());
+        webView.setWebViewClient(new EpicWebViewCLient());
+
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webView.loadUrl(vidUrl);
+    }
+
+
+    private void initializeRecyclerView() {
+        new ShowComments(this).showInitialComments(recyclerView);
+    }
+
+    private void reloadMediaPlayerView() {
+       if(!currVidSet.isEmpty()){
+           String vidId = EpicUtils.extractRandomString(currVidSet);
+           Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
+           webView.clearHistory();
+           webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
+       }else{
+           currVidSet = new VidListUtil().getNextVidSet(this);
+           if(currVidSet.isEmpty()){
+               Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
+               String vidId = EpicUtils.extractRandomString(defaultVidSet);
+               EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+               if(vidId == null){
+                   Toast.makeText(this,"Could not retrieve next video",Toast.LENGTH_LONG).show();
+               }else{
+                   Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
+                   webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
+               }
+           }
+       }
+    }
+
+    private void reloadCommentsRecyclerView() {
+
+    }
+
+    @Override
+    public void onStop() {
+        EpicUtils.setSetInSharedPrefs(this,VID_KEY_3,currVidSet);
+        super.onStop();
+    }
+
 
 }

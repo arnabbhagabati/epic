@@ -5,6 +5,7 @@ import static com.kaway.epic.EpicConstants.VID_KEY_1;
 import static com.kaway.epic.EpicConstants.VID_KEY_2;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.kaway.epic.EpicConstants;
 import com.kaway.epic.R;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
@@ -79,6 +81,8 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
                         Set<String> vidSet0 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_0);
                         Set<String> vidSet1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
                         Set<String> vidSet2 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_2);
+
+                        Log.i(EpicConstants.EPIC_LOG_TAG,"vidSet2 is {}"+ vidSet2.toString());
 
                         Glide.with(context)
                                 .load(imgUrl)

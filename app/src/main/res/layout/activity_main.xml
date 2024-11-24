@@ -1,11 +1,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/custom_dark_gray">
 
-    <!-- WebView occupying 65% of the screen height -->
     <WebView
         android:id="@+id/mediaPlayerView"
         android:layout_width="0dp"
@@ -16,7 +16,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.65" />
 
-    <!-- RecyclerView occupying the remaining space -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/commentsRecyclerView"
         android:layout_width="0dp"

@@ -18,7 +18,7 @@ public class EpicConstants {
 
     public static String EPIC_LOG_TAG  = "epic.log";
 
-    public static List<String> DEFAULT_VID_ID_SET = List.of("ihX1pRMmxp8", "3wy1IXmcqrs",
+    public static Set<String> DEFAULT_VID_ID_SET = Set.of("ihX1pRMmxp8", "3wy1IXmcqrs",
                                                         "O3PGXbXja4g","LmStdG66HLw");
     public static String DEFAULT_VID_ID_SET_KEY = "VID_ID_SET_KEY";
 

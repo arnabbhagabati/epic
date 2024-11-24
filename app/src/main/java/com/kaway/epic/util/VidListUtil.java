@@ -11,21 +11,24 @@ import android.util.Log;
 
 import com.kaway.epic.ytservice.VidService;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class VidListUtil {
 
-    public Set<String> getDisplayVidId(Context context){
+    public Set<String> getNextVidSet(Context context){
+        Log.i(EPIC_LOG_TAG,"getting the next set of vids");
         Set<String> op = new HashSet<>();
         Set<String> vids0 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_0);
 
+        Set<String> vids1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
+        Set<String> vids2 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_2);
+        Set<String> vids3 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_3);
+
         if(vids0 == null || vids0.isEmpty()){
-            Set<String> vids1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
+            //Set<String> vids1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
             op.addAll(vids1);
 
             ExecutorService executorService = Executors.newFixedThreadPool(1);
@@ -44,9 +47,9 @@ public class VidListUtil {
         return op;
     }
 
-    public void loadThreeVidKeys(Context context){
+    public void loadThreeVidKeys(Context context, Set<String> currVidSet){
         ExecutorService executorService = Executors.newFixedThreadPool(1);
-        LoadAllVidSets loadAllVidSets = new LoadAllVidSets(context);
+        LoadAllVidSets loadAllVidSets = new LoadAllVidSets(context,currVidSet);
         executorService.submit(loadAllVidSets);
     }
 

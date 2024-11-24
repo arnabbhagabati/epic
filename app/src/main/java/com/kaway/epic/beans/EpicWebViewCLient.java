@@ -35,7 +35,10 @@ public class EpicWebViewCLient extends WebViewClient{
     @Override
     public void onPageFinished(WebView view, String url) {
         System.out.println("onPageFinished called");
-        view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");
+        view.clearHistory();
+        view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");  // this line is needed to autoplay the video
+        super.onPageFinished(view, url);
+        //view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");
     }
 
 

@@ -12,6 +12,7 @@ import com.kaway.epic.db.DynDbDao;
 import com.kaway.epic.ytservice.VidService;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,9 +21,11 @@ import java.util.concurrent.Future;
 public class LoadAllVidSets implements Runnable {
 
     Context context;
+    Set<String> currVidSet;
 
-    public LoadAllVidSets(Context context) {
+    public LoadAllVidSets(Context context,Set<String> currVidSet) {
         this.context = context;
+        this.currVidSet = currVidSet;
     }
 
     @Override
@@ -42,11 +45,10 @@ public class LoadAllVidSets implements Runnable {
             int vidSetRowCnt = Integer.parseInt(zeroSet.get(0));
             VidService vidService = new VidService(context);
 
-
+            currVidSet.addAll(vidService.getVidSet(vidSetRowCnt));
             EpicUtils.setSetInSharedPrefs(context, VID_KEY_0, vidService.getVidSet(vidSetRowCnt));
             EpicUtils.setSetInSharedPrefs(context, VID_KEY_1, vidService.getVidSet(vidSetRowCnt));
             EpicUtils.setSetInSharedPrefs(context, VID_KEY_2, vidService.getVidSet(vidSetRowCnt));
-
 
         }
     }
