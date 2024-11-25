@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.65" />
+        app:layout_constraintWidth_percent="0.7" />
 
     <!-- RecyclerView occupying 35% of the screen width -->
     <androidx.recyclerview.widget.RecyclerView

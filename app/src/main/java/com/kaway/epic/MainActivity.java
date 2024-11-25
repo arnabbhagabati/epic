@@ -4,6 +4,7 @@ import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
 import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
 import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
+import static com.kaway.epic.EpicConstants.VID_ID;
 import static com.kaway.epic.EpicConstants.VID_KEY_0;
 import static com.kaway.epic.EpicConstants.VID_KEY_3;
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private GestureDetector gestureDetector;
     Set<String> currVidSet = new HashSet<>();
+    String activityVidId = null;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -96,8 +98,15 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        initializeWebView(EpicUtils.getEmbedUrl(videoId));
-        initializeRecyclerView(videoId);
+        if(savedInstanceState == null || savedInstanceState.isEmpty()){
+            initializeWebView(videoId);
+            initializeRecyclerView(videoId);
+        }else{
+            String savedVidId = savedInstanceState.getString(VID_ID);
+            initializeWebView(savedVidId);
+            initializeRecyclerView(savedVidId);
+        }
+
     }
 
     @Override
@@ -184,7 +193,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void initializeWebView(String vidUrl) {
+    private void initializeWebView(String vidId) {
+        String vidUrl = EpicUtils.getEmbedUrl(vidId);
         webView.setWebChromeClient(new MyChrome());
         webView.setWebViewClient(new EpicWebViewCLient());
 
@@ -192,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webView.loadUrl(vidUrl);
+        activityVidId = vidId;
     }
 
 
@@ -200,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reloadMediaPlayerView() {
-        String vidId = null;
+       String vidId = null;
        if(!currVidSet.isEmpty()){
            vidId = EpicUtils.extractRandomString(currVidSet);
            Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
@@ -220,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
        reloadCommentsRecyclerView(vidId);
        webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
+       activityVidId = vidId;
     }
 
     private void reloadCommentsRecyclerView(String vidId) {
@@ -234,5 +246,10 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(VID_ID,activityVidId);
+    }
 
 }

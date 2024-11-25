@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class EpicConstants {
 
+    public static final String VID_ID = "vidId";
+
     public static final String VID_ID_LIST_TABLE_PK_COL = "id";
     public static final String VID_ID_LIST_TABLE_VID_SET_COL = "vidSet";
     public static final String FUN_VID_ID_LIST_TABLE_NAME = "funVidList";
