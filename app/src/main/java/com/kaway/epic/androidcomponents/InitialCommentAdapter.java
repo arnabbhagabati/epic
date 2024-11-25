@@ -48,13 +48,14 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
         Comment comment = comments.get(position);
         holder.commentAuthor.setText(comment.getAuthor());
         holder.commentText.setText(comment.getText());
-        String imgUrl = "https://yt3.ggpht.com/GNO2Zd94dZUUwdbrpEgXfH5wqv3O61YG3IhR5iQ_nb-iPOJ0Ws2f1gYUz58j133XXtPbQ3Jr=s48-c-k-c0x00ffffff-no-rj";
+        String imgUrl = comment.getProfileIconUrl();
 
         Glide.with(context)
                 .load(imgUrl)
                 .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)
                 .into(holder.commenterProfilePic);
 
+        holder.commentTimeElapsed.setText(comment.getCommentDate());
         holder.commenterProfilePic.setBackgroundResource(R.drawable.circular_background);
         // Clear any previous replies in the container
         holder.repliesContainer.removeAllViews();
@@ -76,19 +77,20 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
                         replyText.setText(reply.getText());
 
                         ImageView replyProfileIcon = replyView.findViewById(R.id.replyProfileIcon);
-                        String imgUrl = "https://yt3.googleusercontent.com/ytc/AIdro_mjQsGOg2LoAg2kibV_XcmafRnjoY_WsvTla0GeydUGhnU=s900-c-k-c0x00ffffff-no-rj";
+                        String imgUrl = reply.getProfileIcon();
 
-                        Set<String> vidSet0 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_0);
+                        /*Set<String> vidSet0 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_0);
                         Set<String> vidSet1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
                         Set<String> vidSet2 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_2);
 
-                        Log.i(EpicConstants.EPIC_LOG_TAG,"vidSet2 is {}"+ vidSet2.toString());
+                        Log.i(EpicConstants.EPIC_LOG_TAG,"vidSet2 is {}"+ vidSet2.toString());*/
 
                         Glide.with(context)
                                 .load(imgUrl)
                                 .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)
                                 .into(replyProfileIcon);
-
+                        TextView replyTImeELapsed = replyView.findViewById(R.id.replyTimeElapsed);
+                        replyTImeELapsed.setText(reply.getReplyDate());
                         holder.repliesContainer.addView(replyView);
                     }
                     viewMoreReplies.setText(context.getString(R.string.hide_replies));
@@ -113,6 +115,7 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
         ImageView commenterProfilePic;
         TextView commentAuthor;
         TextView commentText;
+        TextView commentTimeElapsed;
         LinearLayout repliesContainer;
 
         CommentViewHolder(@NonNull View itemView) {
@@ -121,6 +124,7 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
             commentAuthor = itemView.findViewById(R.id.commenterName);
             commentText = itemView.findViewById(R.id.commentText);
             repliesContainer = itemView.findViewById(R.id.replies_container);
+            commentTimeElapsed = itemView.findViewById(R.id.commentTimeElapsed);
         }
     }
 }

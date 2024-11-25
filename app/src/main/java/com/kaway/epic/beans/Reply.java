@@ -4,11 +4,15 @@ public class Reply {
     private int id;
     private String author;
     private String text;
+    private String profileIcon;
+    private String replyDate;
 
-    public Reply(int id, String author, String text) {
+    public Reply(int id, String author, String text, String profileIcon, String replyDate) {
         this.id = id;
         this.author = author;
         this.text = text;
+        this.profileIcon = profileIcon;
+        this.replyDate = replyDate;
     }
 
     public int getId() {
@@ -21,5 +25,13 @@ public class Reply {
 
     public String getText() {
         return text;
+    }
+
+    public String getProfileIcon() {
+        return profileIcon;
+    }
+
+    public String getReplyDate() {
+        return replyDate;
     }
 }

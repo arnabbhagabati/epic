@@ -1,6 +1,5 @@
 package com.kaway.epic.db;
 
-import static com.kaway.epic.EpicConstants.FUN_VID_ID_LIST_TABLE_NAME;
 import static com.kaway.epic.EpicConstants.VID_DATA_TABLE_NAME;
 import static com.kaway.epic.EpicConstants.VID_DATA_TABLE_PK_COL;
 import static com.kaway.epic.EpicConstants.VID_DATA_TABLE_VID_DATA_COL;

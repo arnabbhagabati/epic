@@ -10,7 +10,7 @@ public class EpicConstants {
 
     public static final String VID_ID_LIST_TABLE_PK_COL = "id";
     public static final String VID_ID_LIST_TABLE_VID_SET_COL = "vidSet";
-    public static final String FUN_VID_ID_LIST_TABLE_NAME = "funVidList";
+    public static final String VID_ID_LIST_TABLE_NAME = "VidList";
     public static final String INF_VID_ID_LIST_TABLE_NAME = "infVidList";
 
     public static final String VID_DATA_TABLE_NAME = "VidData";
@@ -25,8 +25,7 @@ public class EpicConstants {
 
     public static String EPIC_LOG_TAG  = "epic.log";
 
-    public static Set<String> DEFAULT_VID_ID_SET = Set.of("Llh5abHLPtg", "3wy1IXmcqrs",
-                                                        "O3PGXbXja4g","LmStdG66HLw");
+    public static Set<String> DEFAULT_VID_ID_SET = Set.of("jzHVnptr4sc", "3U9P4-ac0Lc", "BOsm3I8jdlQ","bO7Os1Zu8Z4");
     public static String DEFAULT_VID_ID_SET_KEY = "VID_ID_SET_KEY";
 
 

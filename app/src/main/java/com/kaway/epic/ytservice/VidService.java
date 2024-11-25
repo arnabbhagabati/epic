@@ -12,6 +12,7 @@ import com.kaway.epic.util.EpicUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.List;
@@ -121,15 +122,15 @@ public class VidService  {
     }
 
 
-    public JSONArray getVidData(String vidId){
-        JSONArray op = new JSONArray();
+    public JSONObject getVidData(String vidId){
+        JSONObject op = new JSONObject();
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         VidDetailsDao vidDetailsDao = new VidDetailsDao(vidId);
         Future<String> vidDetailsFuture = executorService.submit(vidDetailsDao);
 
         try {
             String vidDetails = vidDetailsFuture.get();
-            op = new JSONArray(vidDetails);
+            op = new JSONObject(vidDetails);
         } catch (ExecutionException | InterruptedException e) {
             Log.e(EPIC_LOG_TAG,"Error retrieving the vid data ", e);
         } catch (JSONException e) {

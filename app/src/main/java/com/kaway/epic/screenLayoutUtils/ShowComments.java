@@ -11,6 +11,7 @@ import com.kaway.epic.androidcomponents.FullCommentAdapter;
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
+import com.kaway.epic.util.EpicUtils;
 import com.kaway.epic.ytservice.VidService;
 
 import org.json.JSONArray;
@@ -31,27 +32,35 @@ public class ShowComments {
     public void showInitialComments(RecyclerView recyclerView,String vidId){
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        JSONArray vidDataArray = new VidService(context).getVidData(vidId);
         List<Comment> comments = new ArrayList<>();
+        JSONObject vidDataObj = new VidService(context).getVidData(vidId);
+        try {
+            JSONArray commentsArray = vidDataObj.getJSONArray("Comments");
 
-        for(int i=0;i<vidDataArray.length();i++){
-            try {
-                JSONObject comment = new JSONObject(String.valueOf(vidDataArray.get(i)));
-                String author = comment.getString("author");
-                String commentText = comment.getString("commentText");
-                JSONArray replies = comment.getJSONArray("replies");
-                List<Reply> repliesList = new ArrayList<>();
-                for(int j=0;j<replies.length();j++){
-                    JSONObject reply = new JSONObject(replies.getString(j));
-                    String replyText = reply.getString("replyText");
-                    String replyAuth = reply.getString("author");
-                    repliesList.add(new Reply(j,replyAuth,replyText));
+            for(int i=0;i<commentsArray.length();i++){
+                try {
+                    JSONObject comment = new JSONObject(String.valueOf(commentsArray.get(i)));
+                    String author = comment.getString("author");
+                    String commentText = comment.getString("commentText");
+                    JSONArray replies = comment.getJSONArray("replies");
+                    String profileIconUrl = comment.getString("authorProfileImgUrl");
+                    String commentDate = EpicUtils.getTimeElapsed(comment.getString("commentDate"));
+                    List<Reply> repliesList = new ArrayList<>();
+                    for(int j=0;j<replies.length();j++){
+                        JSONObject reply = new JSONObject(replies.getString(j));
+                        String replyText = reply.getString("replyText");
+                        String replyAuth = reply.getString("author");
+                        String replierIcon = reply.getString("authorProfileImgUrl");
+                        String replyDate = EpicUtils.getTimeElapsed(reply.getString("commentDate"));
+                        repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate));
+                    }
+                    comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate));
+                } catch (JSONException e) {
+                    Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
                 }
-                comments.add(new Comment(i,author,commentText,repliesList));
-            } catch (JSONException e) {
-                Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
             }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
 
         InitialCommentAdapter adapter = new InitialCommentAdapter(context, comments);
@@ -60,25 +69,4 @@ public class ShowComments {
 
     }
 
-    public void showAllComments(RecyclerView recyclerView){
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        List<Reply> replies1 = new ArrayList<>();
-        replies1.add(new Reply(1, "User A", "This is a reply."));
-        replies1.add(new Reply(2, "User B", "View More Replies"));
-
-        List<Reply> replies2 = new ArrayList<>();
-        replies2.add(new Reply(3, "User C", "Yet another reply."));
-
-        List<Comment> comments = new ArrayList<>();
-        comments.add(new Comment(1, "Commenter 1", "This is the first comment.", replies1));
-        comments.add(new Comment(2, "Commenter 2", "This is the second comment.This is a comment text that can span multiple lines.This is a comment text that can span multiple lines.", replies2));
-
-        //Set up the adapter
-        FullCommentAdapter adapter = new FullCommentAdapter(context, comments);
-
-        recyclerView.setAdapter(adapter);
-
-    }
 }
