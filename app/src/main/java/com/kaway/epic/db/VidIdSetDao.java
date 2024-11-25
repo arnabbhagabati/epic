@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class DynDbDao implements Callable<List<String>> {
+public class VidIdSetDao implements Callable<List<String>> {
 
     String val;
 
-    public DynDbDao(String val) {
+    public VidIdSetDao(String val) {
         this.val = val;
     }
 

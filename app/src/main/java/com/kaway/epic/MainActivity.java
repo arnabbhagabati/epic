@@ -83,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         gestureDetector = new GestureDetector(this, new GestureListener());
-        webView.setOnTouchListener((v, event) -> {
+        /*webView.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
             return false;
-        });
+        });*/
         recyclerView.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
             return false;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initializeWebView(EpicUtils.getEmbedUrl(videoId));
-        initializeRecyclerView();
+        initializeRecyclerView(videoId);
     }
 
     @Override
@@ -149,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final int SWIPE_THRESHOLD = 50;  // Minimum distance for a swipe
-        private static final int SWIPE_VELOCITY_THRESHOLD = 50;  // Minimum velocity for a swipe
+        private static final int SWIPE_THRESHOLD = 75;  // Minimum distance for a swipe
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;  // Minimum velocity for a swipe
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -195,39 +195,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void initializeRecyclerView() {
-        new ShowComments(this).showInitialComments(recyclerView);
+    private void initializeRecyclerView(String vidId) {
+        new ShowComments(this).showInitialComments(recyclerView,vidId);
     }
 
     private void reloadMediaPlayerView() {
+        String vidId = null;
        if(!currVidSet.isEmpty()){
-           String vidId = EpicUtils.extractRandomString(currVidSet);
+           vidId = EpicUtils.extractRandomString(currVidSet);
            Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
-           webView.clearHistory();
-           webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
        }else{
            currVidSet = new VidListUtil().getNextVidSet(this);
            if(currVidSet.isEmpty()){
                Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-               String vidId = EpicUtils.extractRandomString(defaultVidSet);
+               vidId = EpicUtils.extractRandomString(defaultVidSet);
                EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
                if(vidId == null){
                    Toast.makeText(this,"Could not retrieve next video",Toast.LENGTH_LONG).show();
                }else{
                    Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
-                   webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
                }
            }
        }
+
+       reloadCommentsRecyclerView(vidId);
+       webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
     }
 
-    private void reloadCommentsRecyclerView() {
-
+    private void reloadCommentsRecyclerView(String vidId) {
+        recyclerView.removeAllViews();
+        new ShowComments(this).showInitialComments(recyclerView,vidId);
     }
 
     @Override
     public void onStop() {
         EpicUtils.setSetInSharedPrefs(this,VID_KEY_3,currVidSet);
+        Log.i(EPIC_LOG_TAG,"currVidSet saved");
         super.onStop();
     }
 

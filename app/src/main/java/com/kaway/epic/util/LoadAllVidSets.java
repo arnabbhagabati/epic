@@ -8,7 +8,7 @@ import static com.kaway.epic.EpicConstants.VID_KEY_2;
 import android.content.Context;
 import android.util.Log;
 
-import com.kaway.epic.db.DynDbDao;
+import com.kaway.epic.db.VidIdSetDao;
 import com.kaway.epic.ytservice.VidService;
 
 import java.util.List;
@@ -32,8 +32,8 @@ public class LoadAllVidSets implements Runnable {
     public void run() {
 
         ExecutorService executorService = Executors.newFixedThreadPool(1);
-        DynDbDao dynDbDao = new DynDbDao("0");
-        Future<List<String>> zeroSetFuture = executorService.submit(dynDbDao);
+        VidIdSetDao vidIdSetDao = new VidIdSetDao("0");
+        Future<List<String>> zeroSetFuture = executorService.submit(vidIdSetDao);
         List<String> zeroSet = null;
         try {
             zeroSet = zeroSetFuture.get();
