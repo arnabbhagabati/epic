@@ -50,10 +50,10 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
         holder.commentText.setText(comment.getText());
         String imgUrl = comment.getProfileIconUrl();
 
-        /*Glide.with(context)
+        Glide.with(context)
                 .load(imgUrl)
                 .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)
-                .into(holder.commenterProfilePic);*/
+                .into(holder.commenterProfilePic);
 
         holder.commentTimeElapsed.setText(comment.getCommentDate());
         holder.commenterProfilePic.setBackgroundResource(R.drawable.circular_background);
@@ -85,10 +85,10 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
 
                         Log.i(EpicConstants.EPIC_LOG_TAG,"vidSet2 is {}"+ vidSet2.toString());*/
 
-                        /*Glide.with(context)
+                        Glide.with(context)
                                 .load(imgUrl)
                                 .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)
-                                .into(replyProfileIcon);*/
+                                .into(replyProfileIcon);
 
                         TextView replyTImeELapsed = replyView.findViewById(R.id.replyTimeElapsed);
                         replyTImeELapsed.setText(reply.getReplyDate());

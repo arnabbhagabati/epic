@@ -8,8 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kaway.epic.EpicConstants;
-import com.kaway.epic.androidcomponents.FullCommentAdapter;
-import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
 import com.kaway.epic.util.EpicUtils;
@@ -50,16 +48,16 @@ public class ShowComments implements Callable<List<Comment>> {
                     String commentText = comment.getString("commentText");
                     JSONArray replies = comment.getJSONArray("replies");
                     String profileIconUrl = comment.getString("authorProfileImgUrl");
-                    //String commentDate = EpicUtils.getTimeElapsed(comment.getString("commentDate"));
-                    String commentDate = comment.getString("commentDate");
+                    String commentDate = EpicUtils.getTimeElapsed(comment.getString("commentDate"));
+                    //String commentDate = comment.getString("commentDate");
                     List<Reply> repliesList = new ArrayList<>();
                     for(int j=0;j<replies.length();j++){
                         JSONObject reply = new JSONObject(replies.getString(j));
                         String replyText = reply.getString("replyText");
                         String replyAuth = reply.getString("author");
                         String replierIcon = reply.getString("authorProfileImgUrl");
-                        //String replyDate = EpicUtils.getTimeElapsed(reply.getString("commentDate"));
-                        String replyDate = reply.getString("commentDate");
+                        String replyDate = EpicUtils.getTimeElapsed(reply.getString("commentDate"));
+                        //String replyDate = reply.getString("commentDate");
                         repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate));
                     }
                     comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate));
