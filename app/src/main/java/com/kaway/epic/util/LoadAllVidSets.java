@@ -11,6 +11,8 @@ import android.util.Log;
 import com.kaway.epic.db.VidIdSetDao;
 import com.kaway.epic.ytservice.VidService;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -21,9 +23,9 @@ import java.util.concurrent.Future;
 public class LoadAllVidSets implements Runnable {
 
     Context context;
-    Set<String> currVidSet;
+    Set<JSONObject> currVidSet;
 
-    public LoadAllVidSets(Context context,Set<String> currVidSet) {
+    public LoadAllVidSets(Context context,Set<JSONObject> currVidSet) {
         this.context = context;
         this.currVidSet = currVidSet;
     }
@@ -46,9 +48,9 @@ public class LoadAllVidSets implements Runnable {
             VidService vidService = new VidService(context);
 
             currVidSet.addAll(vidService.getVidSet(vidSetRowCnt));
-            EpicUtils.setSetInSharedPrefs(context, VID_KEY_0, vidService.getVidSet(vidSetRowCnt));
-            EpicUtils.setSetInSharedPrefs(context, VID_KEY_1, vidService.getVidSet(vidSetRowCnt));
-            EpicUtils.setSetInSharedPrefs(context, VID_KEY_2, vidService.getVidSet(vidSetRowCnt));
+            EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_0, vidService.getVidSet(vidSetRowCnt));
+            EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_1, vidService.getVidSet(vidSetRowCnt));
+            EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_2, vidService.getVidSet(vidSetRowCnt));
 
         }
 

@@ -1,5 +1,6 @@
 package com.kaway.epic;
 
+import static com.kaway.epic.EpicConstants.COMMENTS_DATA;
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
 import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
@@ -36,6 +37,9 @@ import com.kaway.epic.util.VidListUtil;
 import com.kaway.epic.ytservice.VidService;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     RecyclerView recyclerView;
     private GestureDetector gestureDetector;
-    Set<String> currVidSet = new HashSet<>();
-    String activityVidId = null;
+    Set<JSONObject> currVidSet = new HashSet<>();
+    JSONObject activityVidId = null;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -67,26 +71,26 @@ public class MainActivity extends AppCompatActivity {
         ConstraintLayout constraintLayout = findViewById(R.id.rootLayout);
         recyclerView = findViewById(R.id.commentsRecyclerView);
 
-        String videoId = "PmvsAi89BDM";
+        JSONObject vidObj = null;
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
             //This is first launch
             VidListUtil vidListUtil = new VidListUtil();
             vidListUtil.loadThreeVidKeys(this,currVidSet);
-            Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-            videoId = EpicUtils.extractRandomString(defaultVidSet);
-            EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+            Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
+            vidObj = EpicUtils.extractRandomJson(defaultVidSet);
+            EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
         }else{
             currVidSet = new VidListUtil().getNextVidSet(this);
             if(!currVidSet.isEmpty()){
-               videoId = EpicUtils.extractRandomString(currVidSet);
+                vidObj = EpicUtils.extractRandomJson(currVidSet);
             }else{
-               Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-               videoId = EpicUtils.extractRandomString(defaultVidSet);
-               EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+               Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
+               vidObj = EpicUtils.extractRandomJson(defaultVidSet);
+               EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
             }
         }
 
-        Log.i(EPIC_LOG_TAG , "Showing vidid "+videoId);
+        Log.i(EPIC_LOG_TAG , "Showing vidid "+vidObj.toString());
 
 
         gestureDetector = new GestureDetector(this, new GestureListener());
@@ -104,12 +108,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(savedInstanceState == null || savedInstanceState.isEmpty()){
-            initializeWebView(videoId);
-            initializeRecyclerView(videoId);
+            initializeWebView(vidObj);
+            initializeRecyclerView(vidObj);
         }else{
-            String savedVidId = savedInstanceState.getString(VID_ID);
-            initializeWebView(savedVidId);
-            initializeRecyclerView(savedVidId);
+            String savedVid = savedInstanceState.getString(VID_ID);
+            try {
+                JSONObject savedVidObj = new JSONObject(savedVid);
+                initializeWebView(savedVidObj);
+                initializeRecyclerView(savedVidObj);
+            } catch (JSONException e) {
+                Log.e(EPIC_LOG_TAG, "Cloud not load vid saved in bundle", e);
+            }
         }
 
     }
@@ -198,83 +207,110 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void initializeWebView(String vidId) {
-        String vidUrl = EpicUtils.getEmbedUrl(vidId);
-        webView.setWebChromeClient(new MyChrome());
-        webView.setWebViewClient(new EpicWebViewCLient());
-
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webView.loadUrl(vidUrl);
-        activityVidId = vidId;
+    private void initializeWebView(JSONObject vidId) {
+        String vidUrl = null;
+        try {
+            vidUrl = EpicUtils.getEmbedUrl(vidId.getString(VID_ID));
+            webView.setWebChromeClient(new MyChrome());
+            webView.setWebViewClient(new EpicWebViewCLient());
+            WebSettings webSettings = webView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setDomStorageEnabled(true);
+            webView.loadUrl(vidUrl);
+            activityVidId = vidId;
+        } catch (JSONException e) {
+            Log.e(EPIC_LOG_TAG, "Cloud not initializeWebView ", e);
+        }
     }
 
 
-    private void initializeRecyclerView(String vidId) {
+    private void initializeRecyclerView(JSONObject vidObj) {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
-        Future<List<Comment>> future = executorService.submit(new ShowComments(this,recyclerView,vidId));
-        executorService.execute(() -> {
-            try {
-                // Get the result from the Callable
-                List<Comment> comments = future.get();
-                InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
 
-                runOnUiThread(() -> recyclerView.setAdapter(adapter));
-            } catch (Exception e) {
-               Log.e(EPIC_LOG_TAG,"Cloud not load comments for vid"+vidId,e);
+        if(vidObj.has(COMMENTS_DATA)){
+
+        }else {
+            try {
+                String vidId = vidObj.getString(VID_ID);
+                Future<List<Comment>> future = executorService.submit(new ShowComments(this, recyclerView, vidId));
+                executorService.execute(() -> {
+                    try {
+                        // Get the result from the Callable
+                        List<Comment> comments = future.get();
+                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+
+                        runOnUiThread(() -> recyclerView.setAdapter(adapter));
+                    } catch (Exception e) {
+                        Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
+                    }
+                });
+                //new ShowComments(this).showInitialComments(recyclerView,vidId);
+                executorService.shutdown();
+            } catch (JSONException e) {
+                Log.e(EPIC_LOG_TAG,"JSON Error in initializeRecyclerView", e);
             }
-        });
-        //new ShowComments(this).showInitialComments(recyclerView,vidId);
-        executorService.shutdown();
+        }
     }
 
     private void reloadMediaPlayerView() {
-       String vidId = null;
-       if(!currVidSet.isEmpty()){
-           vidId = EpicUtils.extractRandomString(currVidSet);
-           Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
-       }else{
-           currVidSet = new VidListUtil().getNextVidSet(this);
-           if(currVidSet.isEmpty()){
-               Set<String> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-               vidId = EpicUtils.extractRandomString(defaultVidSet);
-               EpicUtils.setSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
-               if(vidId == null){
-                   Toast.makeText(this,"Could not retrieve next video",Toast.LENGTH_LONG).show();
-               }else{
-                   Log.i(EPIC_LOG_TAG,"Loading new vidId "+vidId);
+       JSONObject vidObject = null;
+       try {
+           if(!currVidSet.isEmpty()){
+               vidObject = EpicUtils.extractRandomJson(currVidSet);
+           }else{
+               currVidSet = new VidListUtil().getNextVidSet(this);
+               if(currVidSet.isEmpty()){
+                   Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
+                   vidObject = EpicUtils.extractRandomJson(defaultVidSet);
+                   EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+                   if(vidObject == null || vidObject.isNull(VID_ID)){
+                       Toast.makeText(this,"Could not retrieve next video",Toast.LENGTH_LONG).show();
+                   }else{
+                       Log.i(EPIC_LOG_TAG,"Loading new vidId in reloadMediaPlayerView ");
+                   }
                }
            }
-       }
 
-       reloadCommentsRecyclerView(vidId);
-       webView.loadUrl(EpicUtils.getEmbedUrl(vidId));
-       activityVidId = vidId;
+           reloadCommentsRecyclerView(vidObject);
+           webView.loadUrl(EpicUtils.getEmbedUrl(vidObject.getString(VID_ID)));
+        } catch (JSONException e) {
+           Log.i(EPIC_LOG_TAG,"Error Loading new vidId in reloadMediaPlayerView ");
+        }
+        activityVidId = vidObject;
     }
 
-    private void reloadCommentsRecyclerView(String vidId) {
+    private void reloadCommentsRecyclerView(JSONObject vidObject) {
         recyclerView.setAdapter(null);
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-        Future<List<Comment>> future = executorService.submit(new ShowComments(this,recyclerView,vidId));
-        executorService.execute(() -> {
-            try {
-                // Get the result from the Callable
-                List<Comment> comments = future.get();
-                InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+        if(vidObject.has(COMMENTS_DATA)){
 
-                runOnUiThread(() -> recyclerView.setAdapter(adapter));
-            } catch (Exception e) {
-                Log.e(EPIC_LOG_TAG,"Cloud not load comments for vid"+vidId,e);
+        }else {
+
+            try {
+                String vidId = vidObject.getString(VID_ID);
+                ExecutorService executorService = Executors.newFixedThreadPool(1);
+                Future<List<Comment>> future = executorService.submit(new ShowComments(this, recyclerView, vidId));
+                executorService.execute(() -> {
+                    try {
+                        // Get the result from the Callable
+                        List<Comment> comments = future.get();
+                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+
+                        runOnUiThread(() -> recyclerView.setAdapter(adapter));
+                    } catch (Exception e) {
+                        Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid" + vidId, e);
+                    }
+                });
+                //new ShowComments(this).showInitialComments(recyclerView,vidId);
+                executorService.shutdown();
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
-        });
-        //new ShowComments(this).showInitialComments(recyclerView,vidId);
-        executorService.shutdown();
+        }
     }
 
     @Override
     public void onStop() {
-        EpicUtils.setSetInSharedPrefs(this,VID_KEY_3,currVidSet);
+        EpicUtils.setJSONSetInSharedPrefs(this,VID_KEY_3,currVidSet);
         Log.i(EPIC_LOG_TAG,"currVidSet saved");
         super.onStop();
     }
@@ -282,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(VID_ID,activityVidId);
+        outState.putString(VID_ID,activityVidId.toString());
     }
 
 }

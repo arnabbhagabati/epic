@@ -2,6 +2,7 @@ package com.kaway.epic.ytservice;
 
 import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
 import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
+import static com.kaway.epic.EpicConstants.VID_ID;
 
 import android.content.Context;
 import android.util.Log;
@@ -31,8 +32,8 @@ public class VidService  {
         this.context = context;
     }
 
-    public Set<String> getVidSet(){
-        Set<String> vidSet = new HashSet<>();
+    public Set<JSONObject> getVidSet(){
+        Set<JSONObject> vidSet = new HashSet<>();
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         VidIdSetDao vidIdSetDao = new VidIdSetDao("0");
         Future<List<String>> zeroSetFuture = executorService.submit(vidIdSetDao);
@@ -66,9 +67,15 @@ public class VidService  {
 
                     try {
                         List<String> vidList = firstVidSetFuture.get();
-                        vidSet.addAll(vidList);
+                        for(String vId : vidList){
+                            JSONObject vidObj = new JSONObject();
+                            vidObj.put(VID_ID,vId);
+                            vidSet.add(vidObj);
+                        }
                     } catch (ExecutionException | InterruptedException e) {
                         Log.e(EPIC_LOG_TAG,"Error retrieving the vidList", e);
+                    } catch (JSONException e) {
+                        Log.e(EPIC_LOG_TAG,"Error creating json in getVidSet", e);
                     }
 
                     //EpicUtils.setListInSharedPrefs(context,VID_KEY_2,firstVidSet);
@@ -83,9 +90,9 @@ public class VidService  {
     }
 
 
-    public Set<String> getVidSet(int vidSetRowCnt){
+    public Set<JSONObject> getVidSet(int vidSetRowCnt){
 
-        Set<String> vidSet = new HashSet<>();
+        Set<JSONObject> vidSet = new HashSet<>();
         Set<String> alreadyRetVidSetIds = EpicUtils.getSetInSharedPrefs(this.context,RETRIEVED_VID_SET_SET_KEY);
         Set<String> triedSet = new HashSet<>();
 
@@ -107,9 +114,16 @@ public class VidService  {
 
                 try {
                     List<String> vidList = firstVidSetFuture.get();
-                    vidSet.addAll(vidList);
+                    for(String vId : vidList){
+                        JSONObject vidObj = new JSONObject();
+                        vidObj.put(VID_ID,vId);
+                        vidSet.add(vidObj);
+                    }
+
                 } catch (ExecutionException | InterruptedException e) {
                     Log.e(EPIC_LOG_TAG,"Error retrieving the vidList set", e);
+                } catch (JSONException e) {
+                    Log.e(EPIC_LOG_TAG,"Error creating json while retrieving the vidList set", e);
                 }
 
                 alreadyRetVidSetIds.add(nextVidSetIdStr);
