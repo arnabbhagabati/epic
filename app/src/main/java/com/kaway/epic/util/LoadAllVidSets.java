@@ -51,5 +51,7 @@ public class LoadAllVidSets implements Runnable {
             EpicUtils.setSetInSharedPrefs(context, VID_KEY_2, vidService.getVidSet(vidSetRowCnt));
 
         }
+
+        executorService.shutdown();
     }
 }

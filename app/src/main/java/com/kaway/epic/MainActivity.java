@@ -26,6 +26,8 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.kaway.epic.androidcomponents.InitialCommentAdapter;
+import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.EpicWebViewCLient;
 
 import com.kaway.epic.screenLayoutUtils.ShowComments;
@@ -39,6 +41,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -207,7 +212,21 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initializeRecyclerView(String vidId) {
-        new ShowComments(this).showInitialComments(recyclerView,vidId);
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        Future<List<Comment>> future = executorService.submit(new ShowComments(this,recyclerView,vidId));
+        executorService.execute(() -> {
+            try {
+                // Get the result from the Callable
+                List<Comment> comments = future.get();
+                InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+
+                runOnUiThread(() -> recyclerView.setAdapter(adapter));
+            } catch (Exception e) {
+               Log.e(EPIC_LOG_TAG,"Cloud not load comments for vid"+vidId,e);
+            }
+        });
+        //new ShowComments(this).showInitialComments(recyclerView,vidId);
+        executorService.shutdown();
     }
 
     private void reloadMediaPlayerView() {
@@ -235,8 +254,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reloadCommentsRecyclerView(String vidId) {
-        recyclerView.removeAllViews();
-        new ShowComments(this).showInitialComments(recyclerView,vidId);
+        recyclerView.setAdapter(null);
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        Future<List<Comment>> future = executorService.submit(new ShowComments(this,recyclerView,vidId));
+        executorService.execute(() -> {
+            try {
+                // Get the result from the Callable
+                List<Comment> comments = future.get();
+                InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+
+                runOnUiThread(() -> recyclerView.setAdapter(adapter));
+            } catch (Exception e) {
+                Log.e(EPIC_LOG_TAG,"Cloud not load comments for vid"+vidId,e);
+            }
+        });
+        //new ShowComments(this).showInitialComments(recyclerView,vidId);
+        executorService.shutdown();
     }
 
     @Override

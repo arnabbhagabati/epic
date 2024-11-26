@@ -35,6 +35,7 @@ public class VidListUtil {
             RotateVidLists rotateVidLists = new RotateVidLists(context,1);
 
             executorService.submit(rotateVidLists);
+            executorService.shutdown();
 
         }else{
             op.addAll(vids0);
@@ -42,6 +43,7 @@ public class VidListUtil {
             RotateVidLists rotateVidLists = new RotateVidLists(context,0);
 
             executorService.submit(rotateVidLists);
+            executorService.shutdown();
         }
 
         return op;
@@ -51,6 +53,7 @@ public class VidListUtil {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         LoadAllVidSets loadAllVidSets = new LoadAllVidSets(context,currVidSet);
         executorService.submit(loadAllVidSets);
+        executorService.shutdown();
     }
 
 

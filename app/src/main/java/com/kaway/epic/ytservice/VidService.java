@@ -78,7 +78,7 @@ public class VidService  {
                 }
             }
         }
-
+        executorService.shutdown();
         return vidSet;
     }
 
@@ -115,6 +115,7 @@ public class VidService  {
                 alreadyRetVidSetIds.add(nextVidSetIdStr);
                 EpicUtils.setSetInSharedPrefs(this.context,RETRIEVED_VID_SET_SET_KEY,alreadyRetVidSetIds);
                 found=true;
+                executorService.shutdown();
             }
         }
 
@@ -136,7 +137,7 @@ public class VidService  {
         } catch (JSONException e) {
             Log.e(EPIC_LOG_TAG,"JSONException retrieving the vid data ", e);
         }
-
+        executorService.shutdown();
         return op;
     }
 
