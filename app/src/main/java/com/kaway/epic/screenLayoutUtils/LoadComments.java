@@ -2,7 +2,6 @@ package com.kaway.epic.screenLayoutUtils;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public class ShowComments implements Callable<List<Comment>> {
+public class LoadComments implements Callable<List<Comment>> {
 
     Context context;
     RecyclerView recyclerView;
     String vidId;
 
-    public ShowComments(Context context, RecyclerView recyclerView, String vidId) {
+    public LoadComments(Context context, RecyclerView recyclerView, String vidId) {
         this.context = context;
         this.recyclerView = recyclerView;
         this.vidId = vidId;
@@ -48,19 +47,19 @@ public class ShowComments implements Callable<List<Comment>> {
                     String commentText = comment.getString("commentText");
                     JSONArray replies = comment.getJSONArray("replies");
                     String profileIconUrl = comment.getString("authorProfileImgUrl");
-                    String commentDate = EpicUtils.getTimeElapsed(comment.getString("commentDate"));
-                    //String commentDate = comment.getString("commentDate");
+                    String commentDate = "  "+EpicUtils.getTimeElapsed(comment.getString("commentDate"));
+                    String likes = EpicUtils.formatNumberToCompact(Long.parseLong(comment.getString("likes")));
                     List<Reply> repliesList = new ArrayList<>();
                     for(int j=0;j<replies.length();j++){
                         JSONObject reply = new JSONObject(replies.getString(j));
                         String replyText = reply.getString("replyText");
                         String replyAuth = reply.getString("author");
                         String replierIcon = reply.getString("authorProfileImgUrl");
-                        String replyDate = EpicUtils.getTimeElapsed(reply.getString("commentDate"));
-                        //String replyDate = reply.getString("commentDate");
-                        repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate));
+                        String replyDate = "  "+EpicUtils.getTimeElapsed(reply.getString("commentDate"));
+                        String replyLikes = EpicUtils.formatNumberToCompact(Long.parseLong(reply.getString("likes")));
+                        repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate,replyLikes));
                     }
-                    comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate));
+                    comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate,likes));
                 } catch (JSONException e) {
                     Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
                 }

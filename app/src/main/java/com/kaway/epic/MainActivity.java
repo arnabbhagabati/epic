@@ -1,12 +1,10 @@
 package com.kaway.epic;
 
 import static com.kaway.epic.EpicConstants.COMMENTS_DATA;
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
 import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
 import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
 import static com.kaway.epic.EpicConstants.VID_ID;
-import static com.kaway.epic.EpicConstants.VID_KEY_0;
 import static com.kaway.epic.EpicConstants.VID_KEY_3;
 
 import android.os.Bundle;
@@ -31,19 +29,16 @@ import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.EpicWebViewCLient;
 
-import com.kaway.epic.screenLayoutUtils.ShowComments;
+import com.kaway.epic.screenLayoutUtils.LoadComments;
 import com.kaway.epic.util.EpicUtils;
 import com.kaway.epic.util.VidListUtil;
-import com.kaway.epic.ytservice.VidService;
 
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,8 +80,12 @@ public class MainActivity extends AppCompatActivity {
                 vidObj = EpicUtils.extractRandomJson(currVidSet);
             }else{
                Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-               vidObj = EpicUtils.extractRandomJson(defaultVidSet);
-               EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+               if(defaultVidSet.isEmpty()){
+                   Toast.makeText(this,"Could not find any more videos to show",Toast.LENGTH_LONG).show();
+               }else {
+                   vidObj = EpicUtils.extractRandomJson(defaultVidSet);
+                   EpicUtils.setJSONSetInSharedPrefs(this, DEFAULT_VID_ID_SET_KEY, defaultVidSet);
+               }
             }
         }
 
@@ -232,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         }else {
             try {
                 String vidId = vidObj.getString(VID_ID);
-                Future<List<Comment>> future = executorService.submit(new ShowComments(this, recyclerView, vidId));
+                Future<List<Comment>> future = executorService.submit(new LoadComments(this, recyclerView, vidId));
                 executorService.execute(() -> {
                     try {
                         // Get the result from the Callable
@@ -288,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String vidId = vidObject.getString(VID_ID);
                 ExecutorService executorService = Executors.newFixedThreadPool(1);
-                Future<List<Comment>> future = executorService.submit(new ShowComments(this, recyclerView, vidId));
+                Future<List<Comment>> future = executorService.submit(new LoadComments(this, recyclerView, vidId));
                 executorService.execute(() -> {
                     try {
                         // Get the result from the Callable

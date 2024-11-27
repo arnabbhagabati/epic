@@ -168,4 +168,18 @@ public class EpicUtils {
     }
 
 
+    public static String formatNumberToCompact(long number) {
+        if (number < 1000) {
+            return String.valueOf(number); // No conversion needed
+        } else if (number < 1_000_000) {
+            return String.format("%.1fK", number / 1000.0);
+        } else if (number < 1_000_000_000) {
+            return String.format("%.1fM", number / 1_000_000.0);
+        } else {
+            return String.format("%.1fB", number / 1_000_000_000.0);
+        }
+    }
+
+
+
 }

@@ -1,11 +1,6 @@
 package com.kaway.epic.androidcomponents;
 
-import static com.kaway.epic.EpicConstants.VID_KEY_0;
-import static com.kaway.epic.EpicConstants.VID_KEY_1;
-import static com.kaway.epic.EpicConstants.VID_KEY_2;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.kaway.epic.EpicConstants;
 import com.kaway.epic.R;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
-import com.kaway.epic.util.EpicUtils;
 
 import java.util.List;
-import java.util.Set;
 
 public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentAdapter.CommentViewHolder>{
 
@@ -57,10 +49,11 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
 
         holder.commentTimeElapsed.setText(comment.getCommentDate());
         holder.commenterProfilePic.setBackgroundResource(R.drawable.circular_background);
+        holder.commentLikeCount.setText(comment.getLikeCount());
         // Clear any previous replies in the container
         holder.repliesContainer.removeAllViews();
 
-        View replyView = LayoutInflater.from(context).inflate(R.layout.comment_reply_initial, holder.repliesContainer, false);
+        View replyView = LayoutInflater.from(context).inflate(R.layout.view_replies, holder.repliesContainer, false);
         TextView viewMoreReplies = replyView.findViewById(R.id.viewMoreReplies);
 
 
@@ -92,7 +85,12 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
 
                         TextView replyTImeELapsed = replyView.findViewById(R.id.replyTimeElapsed);
                         replyTImeELapsed.setText(reply.getReplyDate());
+
+                        TextView replyLikes = replyView.findViewById(R.id.replyLikesCount);
+                        replyLikes.setText(reply.getLikeCount());
+
                         holder.repliesContainer.addView(replyView);
+
                     }
                     viewMoreReplies.setText(context.getString(R.string.hide_replies));
                 }else{
@@ -117,6 +115,7 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
         TextView commentAuthor;
         TextView commentText;
         TextView commentTimeElapsed;
+        TextView commentLikeCount;
         LinearLayout repliesContainer;
 
         CommentViewHolder(@NonNull View itemView) {
@@ -126,6 +125,7 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
             commentText = itemView.findViewById(R.id.commentText);
             repliesContainer = itemView.findViewById(R.id.replies_container);
             commentTimeElapsed = itemView.findViewById(R.id.commentTimeElapsed);
+            commentLikeCount = itemView.findViewById(R.id.commentLikesCount);
         }
     }
 }

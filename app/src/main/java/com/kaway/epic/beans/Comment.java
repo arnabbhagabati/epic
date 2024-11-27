@@ -10,14 +10,21 @@ public class Comment {
 
     private String profileIconUrl;
     private String commentDate;
+    private String likeCount;
 
-    public Comment(int id, String author, String text, List<Reply> replies, String profileIconUrl,String commentDate) {
+    public Comment(int id, String author,
+                            String text,
+                            List<Reply> replies,
+                            String profileIconUrl,
+                            String commentDate,
+                            String likeCount) {
         this.id = id;
         this.author = author;
         this.text = text;
         this.replies = replies;
         this.profileIconUrl = profileIconUrl;
         this.commentDate = commentDate;
+        this.likeCount = likeCount;
     }
 
     public int getId() {
@@ -40,16 +47,11 @@ public class Comment {
         return profileIconUrl;
     }
 
-    public void setProfileIconUrl(String profileIconUrl) {
-        this.profileIconUrl = profileIconUrl;
-    }
-
     public String getCommentDate() {
         return commentDate;
     }
-
-    public void setCommentDate(String commentDate) {
-        this.commentDate = commentDate;
+    public String getLikeCount() {
+        return likeCount;
     }
 }
 

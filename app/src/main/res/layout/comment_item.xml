@@ -1,7 +1,7 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="8dp"
     android:background="@android:color/transparent">
@@ -67,7 +67,31 @@
             android:textSize="14sp"
             android:layout_marginTop="4dp"
             android:lineSpacingExtra="2dp" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
+            <TextView
+                android:id="@+id/commentLikesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:layout_marginEnd="4dp"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/commentThumbsUpIcon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/thumb_up_24px"
+                android:contentDescription="@string/thumbs_up_icon"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="2dp"
+                app:tint="@android:color/white" />
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/replies_container"
             android:layout_width="match_parent"
