@@ -3,13 +3,38 @@ package com.kaway.epic.beans;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.kaway.epic.R;
+
 public class EpicWebViewCLient extends WebViewClient{
+
+    /*ConstraintLayout constraintLayout;
+
+    public EpicWebViewCLient(ConstraintLayout constraintLayout) {
+        this.constraintLayout = constraintLayout;
+    }*/
+
     @Override
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         super.doUpdateVisitedHistory(view, url, isReload);
 
         // Example: Update the state of back and forward buttons
         updateNavigationButtons(view);
+        //RecyclerView commentsView = constraintLayout.findViewById(R.id.commentsRecyclerView);
+
+        if(!isReload && !url.contains("www.youtube.com/embed")){
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
+            layoutParams.matchConstraintPercentHeight = 1.0f;
+            view.setLayoutParams(layoutParams);
+        }else{
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
+            layoutParams.matchConstraintPercentHeight = 0.65f;
+            view.setLayoutParams(layoutParams);
+        }
+
+        //view.setHei
 
         System.out.println("something about the url changed "+url);
     }
@@ -35,7 +60,11 @@ public class EpicWebViewCLient extends WebViewClient{
     @Override
     public void onPageFinished(WebView view, String url) {
         System.out.println("onPageFinished called");
-        view.clearHistory();
+
+        if(url.contains("www.youtube.com/embed")){
+            view.clearHistory();
+        }
+
         view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");  // this line is needed to autoplay the video
         super.onPageFinished(view, url);
         //view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");

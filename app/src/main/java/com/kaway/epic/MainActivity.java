@@ -141,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
         private int mOriginalOrientation;
         private int mOriginalSystemUiVisibility;
 
-        MyChrome() {}
-
         public void onHideCustomView()
         {
             ((FrameLayout)getWindow().getDecorView()).removeView(this.mCustomView);

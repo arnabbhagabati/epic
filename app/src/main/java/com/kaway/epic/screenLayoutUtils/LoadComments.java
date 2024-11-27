@@ -43,7 +43,7 @@ public class LoadComments implements Callable<List<Comment>> {
             for(int i=0;i<commentsArray.length();i++){
                 try {
                     JSONObject comment = new JSONObject(String.valueOf(commentsArray.get(i)));
-                    String author = comment.getString("author");
+                    String author = comment.getString("author").substring(1);
                     String commentText = comment.getString("commentText");
                     JSONArray replies = comment.getJSONArray("replies");
                     String profileIconUrl = comment.getString("authorProfileImgUrl");
@@ -53,7 +53,7 @@ public class LoadComments implements Callable<List<Comment>> {
                     for(int j=0;j<replies.length();j++){
                         JSONObject reply = new JSONObject(replies.getString(j));
                         String replyText = reply.getString("replyText");
-                        String replyAuth = reply.getString("author");
+                        String replyAuth = reply.getString("author").substring(1);
                         String replierIcon = reply.getString("authorProfileImgUrl");
                         String replyDate = "  "+EpicUtils.getTimeElapsed(reply.getString("commentDate"));
                         String replyLikes = EpicUtils.formatNumberToCompact(Long.parseLong(reply.getString("likes")));
