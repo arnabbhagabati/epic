@@ -1,5 +1,7 @@
 package com.kaway.epic.beans;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -16,6 +18,12 @@ public class EpicWebViewCLient extends WebViewClient{
         this.constraintLayout = constraintLayout;
     }*/
 
+    Context context;
+
+    public EpicWebViewCLient(Context context) {
+        this.context = context;
+    }
+
     @Override
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         super.doUpdateVisitedHistory(view, url, isReload);
@@ -27,10 +35,22 @@ public class EpicWebViewCLient extends WebViewClient{
         if(!isReload && !url.contains("www.youtube.com/embed")){
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
             layoutParams.matchConstraintPercentHeight = 1.0f;
+            layoutParams.matchConstraintPercentWidth = 1.0f;
             view.setLayoutParams(layoutParams);
+            view.setFocusable(WebView.FOCUSABLE);
+            view.setFocusableInTouchMode(true);
         }else{
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
-            layoutParams.matchConstraintPercentHeight = 0.65f;
+            int orientation = context.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                // code for portrait mode
+                layoutParams.matchConstraintPercentHeight = 0.65f;
+                layoutParams.matchConstraintPercentWidth = 1.0f;
+            } else {
+                // code for landscape mode
+                layoutParams.matchConstraintPercentHeight = 1.0f;
+                layoutParams.matchConstraintPercentWidth = 0.7f;
+            }
             view.setLayoutParams(layoutParams);
         }
 

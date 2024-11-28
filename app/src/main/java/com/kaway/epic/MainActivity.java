@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             vidUrl = EpicUtils.getEmbedUrl(vidId.getString(VID_ID));
             webView.setWebChromeClient(new MyChrome());
-            webView.setWebViewClient(new EpicWebViewCLient());
+            webView.setWebViewClient(new EpicWebViewCLient(this));
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setDomStorageEnabled(true);
