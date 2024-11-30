@@ -24,6 +24,8 @@ public class VidListUtil {
         Log.i(EPIC_LOG_TAG,"getting the next set of vids");
         Set<JSONObject> op = new HashSet<>();
         Set<JSONObject> vids0 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_0);
+        Set<JSONObject> vids11 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_1);
+        Set<JSONObject> vids22 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_2);
 
         if(vids0 == null || vids0.isEmpty()){
             Set<JSONObject> vids1 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_1);

@@ -93,7 +93,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Log.i(EPIC_LOG_TAG , "Showing vidid "+vidObj.toString());
+        if(null == vidObj){
+            Toast.makeText(this,"Could not retrieve videos from backend",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Log.i(EPIC_LOG_TAG , "Showing vidid "+vidObj);
 
 
         /*gestureDetector = new GestureDetector(this, new GestureListener());
@@ -280,17 +285,17 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void initializeWebView(JSONObject vidId) {
+    private void initializeWebView(JSONObject vidObj) {
         String vidUrl = null;
         try {
-            vidUrl = EpicUtils.getEmbedUrl(vidId.getString(VID_ID));
+            vidUrl = EpicUtils.getEmbedUrl(vidObj.getString(VID_ID));
             webView.setWebChromeClient(new MyChrome());
             webView.setWebViewClient(new EpicWebViewCLient(this,rootLayout));
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setDomStorageEnabled(true);
             webView.loadUrl(vidUrl);
-            activityVidId = vidId;
+            activityVidId = vidObj;
         } catch (JSONException e) {
             Log.e(EPIC_LOG_TAG, "Cloud not initializeWebView ", e);
         }
@@ -328,24 +333,34 @@ public class MainActivity extends AppCompatActivity {
     private void reloadMediaPlayerView() {
        JSONObject vidObject = null;
        try {
-           if(!currVidSet.isEmpty()){
+           if(currVidSet != null && !currVidSet.isEmpty()){
                vidObject = EpicUtils.extractRandomJson(currVidSet);
            }else{
+               EpicUtils.setJSONSetInSharedPrefs(this,VID_KEY_3,new HashSet<>());
                currVidSet = new VidListUtil().getNextVidSet(this);
-               if(currVidSet.isEmpty()){
+               if(currVidSet == null || currVidSet.isEmpty()){
                    Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-                   vidObject = EpicUtils.extractRandomJson(defaultVidSet);
-                   EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+                   if(defaultVidSet != null && !defaultVidSet.isEmpty()){
+                       vidObject = EpicUtils.extractRandomJson(defaultVidSet);
+                       EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+                   }
                    if(vidObject == null || vidObject.isNull(VID_ID)){
                        Toast.makeText(this,"Could not retrieve next video",Toast.LENGTH_LONG).show();
                    }else{
                        Log.i(EPIC_LOG_TAG,"Loading new vidId in reloadMediaPlayerView ");
                    }
+               }else{
+                   vidObject = EpicUtils.extractRandomJson(currVidSet);
                }
            }
 
-           reloadCommentsRecyclerView(vidObject);
-           webView.loadUrl(EpicUtils.getEmbedUrl(vidObject.getString(VID_ID)));
+           if(vidObject != null){
+               reloadCommentsRecyclerView(vidObject);
+               webView.loadUrl(EpicUtils.getEmbedUrl(vidObject.getString(VID_ID)));
+           }else{
+               Toast.makeText(this,"Could not retrieve video",Toast.LENGTH_LONG).show();
+           }
+
         } catch (JSONException e) {
            Log.i(EPIC_LOG_TAG,"Error Loading new vidId in reloadMediaPlayerView ");
         }
