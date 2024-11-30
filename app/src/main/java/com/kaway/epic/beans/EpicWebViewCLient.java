@@ -2,6 +2,7 @@ package com.kaway.epic.beans;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,9 +20,11 @@ public class EpicWebViewCLient extends WebViewClient{
     }*/
 
     Context context;
+    ConstraintLayout rootLayout;
 
-    public EpicWebViewCLient(Context context) {
+    public EpicWebViewCLient(Context context,ConstraintLayout rootLayout) {
         this.context = context;
+        this.rootLayout = rootLayout;
     }
 
     @Override
@@ -84,7 +87,7 @@ public class EpicWebViewCLient extends WebViewClient{
         if(url.contains("www.youtube.com/embed")){
             view.clearHistory();
         }
-
+        rootLayout.setVisibility(View.VISIBLE);
         view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");  // this line is needed to autoplay the video
         super.onPageFinished(view, url);
         //view.loadUrl("javascript:(function() { document.getElementsByTagName('video')[0].play(); })()");

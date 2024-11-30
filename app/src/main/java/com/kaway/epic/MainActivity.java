@@ -52,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     Set<JSONObject> currVidSet = new HashSet<>();
     JSONObject activityVidId = null;
+    boolean isLongPress;
+    private float originalX, originalY;
+    ConstraintLayout rootLayout;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         webView = (WebView) findViewById(R.id.mediaPlayerView);
         ConstraintLayout constraintLayout = findViewById(R.id.rootLayout);
         recyclerView = findViewById(R.id.commentsRecyclerView);
+        rootLayout = findViewById(R.id.rootLayout);
 
         JSONObject vidObj = null;
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
@@ -92,19 +96,19 @@ public class MainActivity extends AppCompatActivity {
         Log.i(EPIC_LOG_TAG , "Showing vidid "+vidObj.toString());
 
 
-        gestureDetector = new GestureDetector(this, new GestureListener());
+        /*gestureDetector = new GestureDetector(this, new GestureListener());
         /*webView.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
             return false;
         });*/
-        recyclerView.setOnTouchListener((v, event) -> {
+        /*recyclerView.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
             return false;
         });
         constraintLayout.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
             return false;
-        });
+        });*/
 
         if(savedInstanceState == null || savedInstanceState.isEmpty()){
             initializeWebView(vidObj);
@@ -119,6 +123,78 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(EPIC_LOG_TAG, "Cloud not load vid saved in bundle", e);
             }
         }
+
+
+
+
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+            private float initialX, initialY;
+
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        initialX = event.getRawX();
+                        initialY = event.getRawY();
+                        originalX = rootLayout.getTranslationX();
+                        originalY = rootLayout.getTranslationY();
+                        isLongPress = false;
+
+                        // Start a long-press detection
+                        rootLayout.postDelayed(() -> {
+                            isLongPress = true;
+                            rootLayout.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+                        }, 600); // 500ms for long press
+                        return false;
+
+                    case MotionEvent.ACTION_MOVE:
+                        if (isLongPress) {
+                            float deltaX = event.getRawX() - initialX;
+                            float deltaY = event.getRawY() - initialY;
+
+                            // Move the layout
+                            rootLayout.setTranslationX(originalX + deltaX);
+                            rootLayout.setTranslationY(originalY + deltaY);
+                        }
+                        return false;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        rootLayout.removeCallbacks(null); // Remove long press callback
+                        if (isLongPress) {
+                            float deltaX = Math.abs(rootLayout.getTranslationX() - originalX);
+                            float deltaY = Math.abs(rootLayout.getTranslationY() - originalY);
+
+                            // Get the parent's dimensions
+                            View parent = (View) rootLayout.getParent();
+                            float thresholdX = parent.getWidth() * 0.15f; // 20% of width
+                            float thresholdY = parent.getHeight() * 0.15f; // 20% of height
+
+                            // Snap back if the movement is less than 20% of the parent's dimensions
+                            if (deltaX < thresholdX && deltaY < thresholdY) {
+                                rootLayout.animate()
+                                        .translationX(originalX)
+                                        .translationY(originalY)
+                                        .setDuration(20)
+                                        .start();
+                            }else{
+                                //rootLayout.setVisibility(View.INVISIBLE);
+                                rootLayout.setX(originalX);
+                                rootLayout.setY(originalY);
+                                reloadMediaPlayerView();
+                            }
+                            rootLayout.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                        }
+                        isLongPress = false;
+                        return false;
+
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
 
     }
 
@@ -168,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+    /*private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         private static final int SWIPE_THRESHOLD = 75;  // Minimum distance for a swipe
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;  // Minimum velocity for a swipe
 
@@ -201,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
         // Action for left swipe
         System.out.println("Swiped Left!");
         reloadMediaPlayerView();
-    }
+    }*/
 
     @SuppressLint("SetJavaScriptEnabled")
     private void initializeWebView(JSONObject vidId) {
@@ -209,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             vidUrl = EpicUtils.getEmbedUrl(vidId.getString(VID_ID));
             webView.setWebChromeClient(new MyChrome());
-            webView.setWebViewClient(new EpicWebViewCLient(this));
+            webView.setWebViewClient(new EpicWebViewCLient(this,rootLayout));
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setDomStorageEnabled(true);
@@ -274,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
            Log.i(EPIC_LOG_TAG,"Error Loading new vidId in reloadMediaPlayerView ");
         }
         activityVidId = vidObject;
+        //this.rootLayout.setVisibility(View.VISIBLE);
     }
 
     private void reloadCommentsRecyclerView(JSONObject vidObject) {
