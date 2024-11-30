@@ -9,18 +9,24 @@ import static com.kaway.epic.EpicConstants.VID_KEY_3;
 import android.content.Context;
 import android.util.Log;
 
+import com.kaway.epic.androidcomponents.InitialCommentAdapter;
+import com.kaway.epic.beans.Comment;
+import com.kaway.epic.db.VidIdSetDao;
 import com.kaway.epic.ytservice.VidService;
 
 import org.json.JSONObject;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class VidListUtil {
 
-    public Set<JSONObject> getNextVidSet(Context context){
+    public Set<JSONObject> getNextVidSet(Context context,Set<JSONObject> currVidSet){
         Log.i(EPIC_LOG_TAG,"getting the next set of vids");
         Set<JSONObject> op = new HashSet<>();
         Set<JSONObject> vids0 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_0);
@@ -46,6 +52,16 @@ public class VidListUtil {
             executorService.shutdown();
         }
 
+        if(op == null || op.isEmpty()){
+            op.addAll(EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_2));
+            if(op == null || op.isEmpty()){
+                loadThreeVidKeys(context,currVidSet);
+            }else{
+                loadThreeVidKeys(context);
+            }
+
+        }
+
         return op;
     }
 
@@ -54,6 +70,33 @@ public class VidListUtil {
         LoadAllVidSets loadAllVidSets = new LoadAllVidSets(context,currVidSet);
         executorService.submit(loadAllVidSets);
         executorService.shutdown();
+    }
+
+    public void loadThreeVidKeys(Context context){
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        VidIdSetDao vidIdSetDao = new VidIdSetDao("0");
+        Future<List<String>> zeroSetFuture = executorService.submit(vidIdSetDao);
+        List<String> zeroSet = null;
+        try {
+            zeroSet = zeroSetFuture.get();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(EPIC_LOG_TAG,"Error retrieving even the vidList cnt", e);
+        }
+
+        if(zeroSet != null && !zeroSet.isEmpty()) {
+            int vidSetRowCnt = Integer.parseInt(zeroSet.get(0));
+            executorService.execute(() -> {
+                try {
+                    VidService vidService = new VidService(context);
+                    EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_0, vidService.getVidSet(vidSetRowCnt));
+                    EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_1, vidService.getVidSet(vidSetRowCnt));
+                    EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_2, vidService.getVidSet(vidSetRowCnt));
+                } catch (Exception e) {
+                    Log.e(EPIC_LOG_TAG, "Cloud not loadThreeVidKeys ", e);
+                }
+            });
+
+        }
     }
 
 

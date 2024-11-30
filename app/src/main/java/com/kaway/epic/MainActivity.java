@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             vidObj = EpicUtils.extractRandomJson(defaultVidSet);
             EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
         }else{
-            currVidSet = new VidListUtil().getNextVidSet(this);
+            currVidSet = new VidListUtil().getNextVidSet(this,currVidSet);
             if(!currVidSet.isEmpty()){
                 vidObj = EpicUtils.extractRandomJson(currVidSet);
             }else{
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(null == vidObj){
-            Toast.makeText(this,"Could not retrieve videos from backend",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"- Could not retrieve videos -",Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                vidObject = EpicUtils.extractRandomJson(currVidSet);
            }else{
                EpicUtils.setJSONSetInSharedPrefs(this,VID_KEY_3,new HashSet<>());
-               currVidSet = new VidListUtil().getNextVidSet(this);
+               currVidSet = new VidListUtil().getNextVidSet(this,currVidSet);
                if(currVidSet == null || currVidSet.isEmpty()){
                    Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
                    if(defaultVidSet != null && !defaultVidSet.isEmpty()){
