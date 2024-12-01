@@ -3,6 +3,7 @@ package com.kaway.epic;
 import static com.kaway.epic.EpicConstants.COMMENTS_DATA;
 import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
 import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
+import static com.kaway.epic.EpicConstants.LAST_VID_SET_KEY_IDX;
 import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
 import static com.kaway.epic.EpicConstants.VID_ID;
 import static com.kaway.epic.EpicConstants.VID_KEY_3;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.mediaPlayerView);
-        ConstraintLayout constraintLayout = findViewById(R.id.rootLayout);
         recyclerView = findViewById(R.id.commentsRecyclerView);
         rootLayout = findViewById(R.id.rootLayout);
 
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             vidObj = EpicUtils.extractRandomJson(defaultVidSet);
             EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
         }else{
-            currVidSet = new VidListUtil().getNextVidSet(this,currVidSet);
+            currVidSet = new VidListUtil().getNextVidSet(this);
             if(!currVidSet.isEmpty()){
                 vidObj = EpicUtils.extractRandomJson(currVidSet);
             }else{
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                         rootLayout.postDelayed(() -> {
                             isLongPress = true;
                             rootLayout.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-                        }, 600); // 500ms for long press
+                        }, 1000); // 500ms for long press
                         return false;
 
                     case MotionEvent.ACTION_MOVE:
@@ -336,8 +336,8 @@ public class MainActivity extends AppCompatActivity {
            if(currVidSet != null && !currVidSet.isEmpty()){
                vidObject = EpicUtils.extractRandomJson(currVidSet);
            }else{
-               EpicUtils.setJSONSetInSharedPrefs(this,VID_KEY_3,new HashSet<>());
-               currVidSet = new VidListUtil().getNextVidSet(this,currVidSet);
+               writeCurrVidSetToSharedPref();
+               currVidSet = new VidListUtil().getNextVidSet(this);
                if(currVidSet == null || currVidSet.isEmpty()){
                    Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
                    if(defaultVidSet != null && !defaultVidSet.isEmpty()){
@@ -389,7 +389,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid" + vidId, e);
                     }
                 });
-                //new ShowComments(this).showInitialComments(recyclerView,vidId);
                 executorService.shutdown();
             } catch (JSONException e) {
                 throw new RuntimeException(e);
@@ -399,8 +398,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onStop() {
-        EpicUtils.setJSONSetInSharedPrefs(this,VID_KEY_3,currVidSet);
-        Log.i(EPIC_LOG_TAG,"currVidSet saved");
+        writeCurrVidSetToSharedPref();
         super.onStop();
     }
 
@@ -408,6 +406,12 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(VID_ID,activityVidId.toString());
+    }
+
+    private void writeCurrVidSetToSharedPref(){
+        String lastVidSetKey = EpicUtils.getStringInSharedPrefs(this,LAST_VID_SET_KEY_IDX);
+        EpicUtils.setJSONSetInSharedPrefs(this,lastVidSetKey,currVidSet);
+        Log.i(EPIC_LOG_TAG,"currVidSet saved");
     }
 
 }

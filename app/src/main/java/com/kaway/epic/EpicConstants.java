@@ -30,10 +30,12 @@ public class EpicConstants {
     public static String DEFAULT_VID_ID_SET_KEY = "VID_ID_SET_KEY";
 
 
-    public static String VID_KEY_0 = "VID_KEY_0";
-    public static String VID_KEY_1 = "VID_KEY_1";
-    public static String VID_KEY_2 = "VID_KEY_2";
-    public static String VID_KEY_3 = "VID_KEY_3";
+    public static final String VID_KEY_0 = "VID_KEY_0";
+    public static final String VID_KEY_1 = "VID_KEY_1";
+    public static final String VID_KEY_2 = "VID_KEY_2";
+    public static final String VID_KEY_3 = "VID_KEY_3";
+
+    public static String LAST_VID_SET_KEY_IDX = "LAST_VID_SET_KEY_IDX";
 
     public static int MIN_VID_LIST_SIZE_FOR_FETCH = 20;
 
