@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -130,8 +131,85 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        // GestureDetector for detecting long press
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public void onLongPress(MotionEvent e) {
+                isLongPress = true;
+            }
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+        });
+
+        originalX = rootLayout.getTranslationX();
+        originalY = rootLayout.getTranslationY();
+
+        // OnTouchListener to handle touch events
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+            private float initialX, initialY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                gestureDetector.onTouchEvent(event);
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        initialX = event.getRawX();
+                        initialY = event.getRawY();
+
+                        isLongPress = false;
+                    case MotionEvent.ACTION_MOVE:
+                        if (isLongPress) {
+
+                            float deltaX = event.getRawX() - initialX;
+                            float deltaY = event.getRawY() - initialY;
+
+                            // Adjust for the view's layout parameters
+                            rootLayout.setTranslationX(originalX + deltaX);
+                            rootLayout.setTranslationY(originalY + deltaY);
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        recyclerView.removeCallbacks(null); // Remove long press callback
+                        if (isLongPress) {
+                            float deltaX = Math.abs(rootLayout.getTranslationX() - originalX);
+                            float deltaY = Math.abs(rootLayout.getTranslationY() - originalY);
+
+                            // Get the parent's dimensions
+                            View parent = (View) rootLayout.getParent();
+                            float thresholdX = parent.getWidth() * 0.15f; // 20% of width
+                            float thresholdY = parent.getHeight() * 0.15f; // 20% of height
+
+                            // Snap back if the movement is less than 20% of the parent's dimensions
+                            if (deltaX < thresholdX && deltaY < thresholdY) {
+                                rootLayout.animate()
+                                        .translationX(originalX)
+                                        .translationY(originalY)
+                                        .setDuration(20)
+                                        .start();
+                            }else{
+                                //rootLayout.setVisibility(View.INVISIBLE);
+                                rootLayout.setX(originalX);
+                                rootLayout.setY(originalY);
+                                reloadMediaPlayerView();
+                            }
+                            rootLayout.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                        }
+                        isLongPress = false;
+                        return false;
+                }
+                return false;
+            }
+        });
 
 
+
+        /*
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             private float initialX, initialY;
 
@@ -147,10 +225,14 @@ public class MainActivity extends AppCompatActivity {
                         isLongPress = false;
 
                         // Start a long-press detection
-                        rootLayout.postDelayed(() -> {
-                            isLongPress = true;
-                            rootLayout.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-                        }, 1000); // 500ms for long press
+                        recyclerView.postDelayed(() -> {
+                            float diffX = initialX - event.getRawX();
+                            float diffY = initialY - event.getRawY();
+                            if(Math.abs(diffX)<1 && Math.abs(diffY)<1){
+                                isLongPress = true;
+                                rootLayout.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+                            }
+                        }, 800); // 500ms for long press
                         return false;
 
                     case MotionEvent.ACTION_MOVE:
@@ -165,8 +247,9 @@ public class MainActivity extends AppCompatActivity {
                         return false;
 
                     case MotionEvent.ACTION_UP:
+
                     case MotionEvent.ACTION_CANCEL:
-                        rootLayout.removeCallbacks(null); // Remove long press callback
+                        recyclerView.removeCallbacks(null); // Remove long press callback
                         if (isLongPress) {
                             float deltaX = Math.abs(rootLayout.getTranslationX() - originalX);
                             float deltaY = Math.abs(rootLayout.getTranslationY() - originalY);
@@ -195,11 +278,11 @@ public class MainActivity extends AppCompatActivity {
                         return false;
 
                     default:
-                        break;
+                        isLongPress = false;
                 }
                 return false;
             }
-        });
+        }); */
 
     }
 
@@ -217,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
     private class MyChrome extends WebChromeClient {
 
         private View mCustomView;
-        private WebChromeClient.CustomViewCallback mCustomViewCallback;
+        private CustomViewCallback mCustomViewCallback;
         protected FrameLayout mFullscreenContainer;
         private int mOriginalOrientation;
         private int mOriginalSystemUiVisibility;
@@ -232,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
             this.mCustomViewCallback = null;
         }
 
-        public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback)
+        public void onShowCustomView(View paramView, CustomViewCallback paramCustomViewCallback)
         {
             if (this.mCustomView != null)
             {
