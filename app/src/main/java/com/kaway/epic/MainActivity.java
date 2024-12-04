@@ -6,21 +6,35 @@ import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
 import static com.kaway.epic.EpicConstants.LAST_VID_SET_KEY_IDX;
 import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
 import static com.kaway.epic.EpicConstants.VID_ID;
-import static com.kaway.epic.EpicConstants.VID_KEY_3;
 
+
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
+import androidx.core.splashscreen.SplashScreenViewProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateInterpolator;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -57,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     boolean isLongPress;
     private float originalX, originalY;
     ConstraintLayout rootLayout;
+    JSONObject vidObj = null;
+    private boolean showSpalsh = true;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -64,6 +80,14 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint({"SetJavaScriptEnabled", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        splashScreen.setKeepOnScreenCondition(() -> (showSpalsh || (vidObj == null) ));
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            showSpalsh = false; // Update the condition
+        }, 500);
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -71,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.commentsRecyclerView);
         rootLayout = findViewById(R.id.rootLayout);
 
-        JSONObject vidObj = null;
+
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
             //This is first launch
             VidListUtil vidListUtil = new VidListUtil();
@@ -495,6 +519,16 @@ public class MainActivity extends AppCompatActivity {
         String lastVidSetKey = EpicUtils.getStringInSharedPrefs(this,LAST_VID_SET_KEY_IDX);
         EpicUtils.setJSONSetInSharedPrefs(this,lastVidSetKey,currVidSet);
         Log.i(EPIC_LOG_TAG,"currVidSet saved");
+    }
+
+
+    private ShapeDrawable createRedCircle() {
+        ShapeDrawable shapeDrawable = new ShapeDrawable(new OvalShape());
+        Paint paint = shapeDrawable.getPaint();
+        paint.setColor(getResources().getColor(android.R.color.holo_red_dark, null));
+        paint.setStyle(Paint.Style.STROKE); // Hollow circle
+        paint.setStrokeWidth(10f); // Set the thickness of the boundary
+        return shapeDrawable;
     }
 
 }
