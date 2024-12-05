@@ -12,7 +12,7 @@
 
     <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/black</item> <!-- Background color -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/epic_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/epic_logo_splashscreen</item>
         <item name="windowSplashScreenAnimationDuration">2000</item> <!-- Duration -->
         <item name="postSplashScreenTheme">@style/Base.Theme.Epic</item> <!-- Main theme -->
     </style>
