@@ -45,18 +45,6 @@ public class EpicUtils {
         return sharedPref.getString(key, "");
     }
 
-    public static int getIntInSharedPrefs(Context context, String key){
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
-        return sharedPref.getInt(key, -1);
-    }
-
-    public static void setIntInSharedPrefs(Context context, String key, int value) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(key,value);
-        editor.apply();
-    }
-
     public static void setJSONSetInSharedPrefs(Context context, String key, Set<JSONObject> value) {
         SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -96,13 +84,6 @@ public class EpicUtils {
     public static boolean sharedfPrefContains(Context context, String key){
         SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
         return preferences.contains(key);
-    }
-
-
-    public static String extractRandomString(Set<String> stringSet){
-        String randomStr = stringSet.stream().skip(new Random().nextInt(stringSet.size())).findFirst().orElse(null);
-        stringSet.remove(randomStr);
-        return randomStr;
     }
 
     public static JSONObject extractRandomJson(Set<JSONObject> stringSet){

@@ -12,15 +12,11 @@ public class EpicConstants {
     public static final String VID_ID_LIST_TABLE_PK_COL = "id";
     public static final String VID_ID_LIST_TABLE_VID_SET_COL = "vidSet";
     public static final String VID_ID_LIST_TABLE_NAME = "VidList";
-    public static final String INF_VID_ID_LIST_TABLE_NAME = "infVidList";
 
     public static final String VID_DATA_TABLE_NAME = "VidData";
     public static final String VID_DATA_TABLE_PK_COL = "vidId";
     public static final String VID_DATA_TABLE_VID_DATA_COL = "videoData";
-
-
-    public static String DEFAULT_YT = "VABA4";
-    public static String DEFAULT_VID_ID = "WFcs3+j9OL";
+    
 
     public static String EPIC_TABLE_NAME  = "VID_ID_LIST";
 

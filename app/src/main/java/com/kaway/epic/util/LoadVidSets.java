@@ -20,12 +20,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class LoadAllVidSets implements Runnable {
+public class LoadVidSets implements Runnable {
 
     Context context;
     Set<JSONObject> currVidSet;
 
-    public LoadAllVidSets(Context context,Set<JSONObject> currVidSet) {
+    public LoadVidSets(Context context, Set<JSONObject> currVidSet) {
         this.context = context;
         this.currVidSet = currVidSet;
     }

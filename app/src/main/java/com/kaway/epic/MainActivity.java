@@ -8,22 +8,12 @@ import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
 import static com.kaway.epic.EpicConstants.VID_ID;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
-import androidx.core.splashscreen.SplashScreenViewProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -33,8 +23,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AnticipateInterpolator;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -64,7 +52,7 @@ import java.util.concurrent.Future;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
-    RecyclerView recyclerView;
+    RecyclerView commentsView;
     private GestureDetector gestureDetector;
     Set<JSONObject> currVidSet = new HashSet<>();
     JSONObject activityVidId = null;
@@ -92,14 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         webView = (WebView) findViewById(R.id.mediaPlayerView);
-        recyclerView = findViewById(R.id.commentsRecyclerView);
+        commentsView = findViewById(R.id.commentsRecyclerView);
         rootLayout = findViewById(R.id.rootLayout);
 
 
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
             //This is first launch
             VidListUtil vidListUtil = new VidListUtil();
-            vidListUtil.loadThreeVidKeys(this,currVidSet);
+            vidListUtil.loadVidSetKeys(this,currVidSet);
             Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
             vidObj = EpicUtils.extractRandomJson(defaultVidSet);
             EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
@@ -125,35 +113,19 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(EPIC_LOG_TAG , "Showing vidid "+vidObj);
 
-
-        /*gestureDetector = new GestureDetector(this, new GestureListener());
-        /*webView.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return false;
-        });*/
-        /*recyclerView.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return false;
-        });
-        constraintLayout.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return false;
-        });*/
-
         if(savedInstanceState == null || savedInstanceState.isEmpty()){
             initializeWebView(vidObj);
-            initializeRecyclerView(vidObj);
+            initializeComments(vidObj);
         }else{
             String savedVid = savedInstanceState.getString(VID_ID);
             try {
                 JSONObject savedVidObj = new JSONObject(savedVid);
                 initializeWebView(savedVidObj);
-                initializeRecyclerView(savedVidObj);
+                initializeComments(savedVidObj);
             } catch (JSONException e) {
                 Log.e(EPIC_LOG_TAG, "Cloud not load vid saved in bundle", e);
             }
         }
-
 
         // GestureDetector for detecting long press
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
@@ -172,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         originalY = rootLayout.getTranslationY();
 
         // OnTouchListener to handle touch events
-        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+        commentsView.setOnTouchListener(new View.OnTouchListener() {
             private float initialX, initialY;
 
             @Override
@@ -199,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        recyclerView.removeCallbacks(null); // Remove long press callback
+                        commentsView.removeCallbacks(null); // Remove long press callback
                         if (isLongPress) {
                             float deltaX = Math.abs(rootLayout.getTranslationX() - originalX);
                             float deltaY = Math.abs(rootLayout.getTranslationY() - originalY);
@@ -230,83 +202,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
-
-        /*
-        recyclerView.setOnTouchListener(new View.OnTouchListener() {
-            private float initialX, initialY;
-
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        initialX = event.getRawX();
-                        initialY = event.getRawY();
-                        originalX = rootLayout.getTranslationX();
-                        originalY = rootLayout.getTranslationY();
-                        isLongPress = false;
-
-                        // Start a long-press detection
-                        recyclerView.postDelayed(() -> {
-                            float diffX = initialX - event.getRawX();
-                            float diffY = initialY - event.getRawY();
-                            if(Math.abs(diffX)<1 && Math.abs(diffY)<1){
-                                isLongPress = true;
-                                rootLayout.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-                            }
-                        }, 800); // 500ms for long press
-                        return false;
-
-                    case MotionEvent.ACTION_MOVE:
-                        if (isLongPress) {
-                            float deltaX = event.getRawX() - initialX;
-                            float deltaY = event.getRawY() - initialY;
-
-                            // Move the layout
-                            rootLayout.setTranslationX(originalX + deltaX);
-                            rootLayout.setTranslationY(originalY + deltaY);
-                        }
-                        return false;
-
-                    case MotionEvent.ACTION_UP:
-
-                    case MotionEvent.ACTION_CANCEL:
-                        recyclerView.removeCallbacks(null); // Remove long press callback
-                        if (isLongPress) {
-                            float deltaX = Math.abs(rootLayout.getTranslationX() - originalX);
-                            float deltaY = Math.abs(rootLayout.getTranslationY() - originalY);
-
-                            // Get the parent's dimensions
-                            View parent = (View) rootLayout.getParent();
-                            float thresholdX = parent.getWidth() * 0.15f; // 20% of width
-                            float thresholdY = parent.getHeight() * 0.15f; // 20% of height
-
-                            // Snap back if the movement is less than 20% of the parent's dimensions
-                            if (deltaX < thresholdX && deltaY < thresholdY) {
-                                rootLayout.animate()
-                                        .translationX(originalX)
-                                        .translationY(originalY)
-                                        .setDuration(20)
-                                        .start();
-                            }else{
-                                //rootLayout.setVisibility(View.INVISIBLE);
-                                rootLayout.setX(originalX);
-                                rootLayout.setY(originalY);
-                                reloadMediaPlayerView();
-                            }
-                            rootLayout.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                        }
-                        isLongPress = false;
-                        return false;
-
-                    default:
-                        isLongPress = false;
-                }
-                return false;
-            }
-        }); */
 
     }
 
@@ -355,42 +250,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    /*private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final int SWIPE_THRESHOLD = 75;  // Minimum distance for a swipe
-        private static final int SWIPE_VELOCITY_THRESHOLD = 100;  // Minimum velocity for a swipe
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            float diffX = e2.getX() - e1.getX();
-            float diffY = e2.getY() - e1.getY();
-
-            if (Math.abs(diffX) > Math.abs(diffY)) { // Check if horizontal swipe
-                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffX > 0) {
-                        onSwipeRight();
-                    } else {
-                        onSwipeLeft();
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    private void onSwipeRight() {
-        // Action for right swipe
-        System.out.println("Swiped Right!");
-        reloadMediaPlayerView();
-    }
-
-    private void onSwipeLeft() {
-        // Action for left swipe
-        System.out.println("Swiped Left!");
-        reloadMediaPlayerView();
-    }*/
-
     @SuppressLint("SetJavaScriptEnabled")
     private void initializeWebView(JSONObject vidObj) {
         String vidUrl = null;
@@ -409,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void initializeRecyclerView(JSONObject vidObj) {
+    private void initializeComments(JSONObject vidObj) {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
 
         if(vidObj.has(COMMENTS_DATA)){
@@ -417,14 +276,14 @@ public class MainActivity extends AppCompatActivity {
         }else {
             try {
                 String vidId = vidObj.getString(VID_ID);
-                Future<List<Comment>> future = executorService.submit(new LoadComments(this, recyclerView, vidId));
+                Future<List<Comment>> future = executorService.submit(new LoadComments(this, commentsView, vidId));
                 executorService.execute(() -> {
                     try {
                         // Get the result from the Callable
                         List<Comment> comments = future.get();
                         InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
 
-                        runOnUiThread(() -> recyclerView.setAdapter(adapter));
+                        runOnUiThread(() -> commentsView.setAdapter(adapter));
                     } catch (Exception e) {
                         Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
                     }
@@ -462,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
            }
 
            if(vidObject != null){
-               reloadCommentsRecyclerView(vidObject);
+               reloadCommentsView(vidObject);
                webView.loadUrl(EpicUtils.getEmbedUrl(vidObject.getString(VID_ID)));
            }else{
                Toast.makeText(this,"Could not retrieve video",Toast.LENGTH_LONG).show();
@@ -472,11 +331,10 @@ public class MainActivity extends AppCompatActivity {
            Log.i(EPIC_LOG_TAG,"Error Loading new vidId in reloadMediaPlayerView ");
         }
         activityVidId = vidObject;
-        //this.rootLayout.setVisibility(View.VISIBLE);
     }
 
-    private void reloadCommentsRecyclerView(JSONObject vidObject) {
-        recyclerView.setAdapter(null);
+    private void reloadCommentsView(JSONObject vidObject) {
+        commentsView.setAdapter(null);
         if(vidObject.has(COMMENTS_DATA)){
 
         }else {
@@ -484,14 +342,14 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String vidId = vidObject.getString(VID_ID);
                 ExecutorService executorService = Executors.newFixedThreadPool(1);
-                Future<List<Comment>> future = executorService.submit(new LoadComments(this, recyclerView, vidId));
+                Future<List<Comment>> future = executorService.submit(new LoadComments(this, commentsView, vidId));
                 executorService.execute(() -> {
                     try {
                         // Get the result from the Callable
                         List<Comment> comments = future.get();
                         InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
 
-                        runOnUiThread(() -> recyclerView.setAdapter(adapter));
+                        runOnUiThread(() -> commentsView.setAdapter(adapter));
                     } catch (Exception e) {
                         Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid" + vidId, e);
                     }
@@ -519,16 +377,6 @@ public class MainActivity extends AppCompatActivity {
         String lastVidSetKey = EpicUtils.getStringInSharedPrefs(this,LAST_VID_SET_KEY_IDX);
         EpicUtils.setJSONSetInSharedPrefs(this,lastVidSetKey,currVidSet);
         Log.i(EPIC_LOG_TAG,"currVidSet saved");
-    }
-
-
-    private ShapeDrawable createRedCircle() {
-        ShapeDrawable shapeDrawable = new ShapeDrawable(new OvalShape());
-        Paint paint = shapeDrawable.getPaint();
-        paint.setColor(getResources().getColor(android.R.color.holo_red_dark, null));
-        paint.setStyle(Paint.Style.STROKE); // Hollow circle
-        paint.setStrokeWidth(10f); // Set the thickness of the boundary
-        return shapeDrawable;
     }
 
 }
