@@ -197,6 +197,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+         /*
+        Use this code intstead of OnBackPressed later.
+        Right now this makes back press very low and hangy
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webView.canGoBack()) {
+                    webView.goBack();
+                } else {
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);*/
+
     }
 
     @Override
