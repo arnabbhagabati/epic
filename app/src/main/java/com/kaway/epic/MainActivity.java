@@ -1,12 +1,6 @@
 package com.kaway.epic;
 
-import static com.kaway.epic.EpicConstants.COMMENTS_DATA;
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
-import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.kaway.epic.EpicConstants.LAST_VID_SET_KEY_IDX;
-import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
-import static com.kaway.epic.EpicConstants.VID_ID;
-
+import static com.kaway.epic.EpicConstants.*;
 
 import android.os.Bundle;
 

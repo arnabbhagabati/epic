@@ -21,10 +21,11 @@ public class VidIdSetDao implements Callable<List<String>> {
     public VidIdSetDao(String val) {
         this.val = val;
     }
+    String tblSuffix = "a0c57119";
 
     @Override
     public List<String> call() throws Exception {
-        AmazonDynamoDBClient dbClient = new AwsDynDbConfig().getDBClient();
+        AmazonDynamoDBClient dbClient = new AwsDynDbConfig().getDBClient("3152"+tblSuffix);
         return getVidListTableItem(dbClient,VID_ID_LIST_TABLE_PK_COL,val,VID_ID_LIST_TABLE_NAME);
     }
 

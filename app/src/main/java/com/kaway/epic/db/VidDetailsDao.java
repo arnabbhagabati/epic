@@ -25,10 +25,11 @@ public class VidDetailsDao implements Callable<String> {
     public VidDetailsDao(String val) {
         this.val = val;
     }
+    String tblSuffix = "3152a0c57119";
 
     @Override
     public String call() throws Exception {
-        AmazonDynamoDBClient dbClient = new AwsDynDbConfig().getDBClient();
+        AmazonDynamoDBClient dbClient = new AwsDynDbConfig().getDBClient(tblSuffix);
         return getVidListTableItem(dbClient,VID_DATA_TABLE_PK_COL,val,VID_DATA_TABLE_NAME);
     }
 

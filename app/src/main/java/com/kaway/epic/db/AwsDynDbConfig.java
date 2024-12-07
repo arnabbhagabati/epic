@@ -3,6 +3,7 @@ package com.kaway.epic.db;
 import static com.amazonaws.regions.Regions.US_WEST_2;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.auth.CognitoCredentialsProvider;
@@ -13,6 +14,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
+import com.kaway.epic.EpicConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,63 +25,15 @@ import java.util.concurrent.Callable;
 
 public class AwsDynDbConfig {
 
-    Context context;
-
-    public AwsDynDbConfig(Context context) {
-        this.context = context;
-    }
-
-    public AwsDynDbConfig() {
-
-    }
-
-
-    public List<String> call() throws Exception {
-        List<String> op = new ArrayList<>();
+   String tableName = "us-west-2";
+   public AmazonDynamoDBClient getDBClient(String tableSuffix){
         CognitoCredentialsProvider credentialsProvider = new CognitoCredentialsProvider(
-                 "us-west-2:cbb3044b-20dd-41cd-a93d-3152a0c57119", US_WEST_2);
-        AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(credentialsProvider);
-        dbClient.setRegion(Region.getRegion(US_WEST_2));
-        System.out.println("Epic table ");
-        System.out.println("Epic table regions"+dbClient.getRegions());
-        DescribeTableResult dcr = dbClient.describeTable("funVidList");
-        dbClient.listTables();
-        System.out.println("Epic table funVidList");
-        System.out.println(dcr);
+                tableName+":cbb3044b-20dd-41cd-a93d-"+tableSuffix, US_WEST_2);
 
-        op = getVidListTableItem(dbClient,"id","1","funVidList");
-        return op;
-    }
-
-    public AmazonDynamoDBClient getDBClient(){
-        CognitoCredentialsProvider credentialsProvider = new CognitoCredentialsProvider(
-                "us-west-2:cbb3044b-20dd-41cd-a93d-3152a0c57119", US_WEST_2);
         AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(credentialsProvider);
         dbClient.setRegion(Region.getRegion(US_WEST_2));
 
         return dbClient;
-    }
-
-
-    private List<String> getVidListTableItem(AmazonDynamoDBClient dbClient,String primaryKeyColName,String primaryKeyVal,String tableName){
-
-        Map<String, AttributeValue> keyToGet = new HashMap<>();
-        keyToGet.put(primaryKeyColName, new AttributeValue().withN(primaryKeyVal));
-
-        // Create the GetItemRequest
-        GetItemRequest request = new GetItemRequest();
-        request.setTableName(tableName);
-        request.setKey(keyToGet);
-
-        GetItemResult result = dbClient.getItem(request);
-
-        System.out.println("got some dynamo db result");
-
-        Map<String, AttributeValue> resultMap = result.getItem();
-        AttributeValue vidIdsAttr = resultMap.get("vidSet");
-        List<String> vidIds = vidIdsAttr.getSS();
-
-        return vidIds;
     }
 
 }
