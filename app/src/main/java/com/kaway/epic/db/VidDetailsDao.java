@@ -1,9 +1,6 @@
 package com.kaway.epic.db;
 
-import static com.kaway.epic.EpicConstants.VID_DATA_TABLE_NAME;
-import static com.kaway.epic.EpicConstants.VID_DATA_TABLE_PK_COL;
-import static com.kaway.epic.EpicConstants.VID_DATA_TABLE_VID_DATA_COL;
-import static com.kaway.epic.EpicConstants.VID_ID_LIST_TABLE_PK_COL;
+import static com.kaway.epic.EpicConstants.*;
 
 import android.util.Log;
 
@@ -14,7 +11,6 @@ import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.kaway.epic.EpicConstants;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 

@@ -41,8 +41,6 @@ public class VidIdSetDao implements Callable<List<String>> {
 
         GetItemResult result = dbClient.getItem(request);
 
-        System.out.println("got some dynamo db result");
-
         Map<String, AttributeValue> resultMap = result.getItem();
         AttributeValue vidIdsAttr = resultMap.get("vidSet");
         List<String> vidIds = vidIdsAttr.getSS();

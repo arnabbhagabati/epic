@@ -72,12 +72,6 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
                         ImageView replyProfileIcon = replyView.findViewById(R.id.replyProfileIcon);
                         String imgUrl = reply.getProfileIcon();
 
-                        /*Set<String> vidSet0 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_0);
-                        Set<String> vidSet1 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_1);
-                        Set<String> vidSet2 = EpicUtils.getSetInSharedPrefs(context,VID_KEY_2);
-
-                        Log.i(EpicConstants.EPIC_LOG_TAG,"vidSet2 is {}"+ vidSet2.toString());*/
-
                         Glide.with(context)
                                 .load(imgUrl)
                                 .placeholder(R.drawable.person_24dp).error(R.drawable.person_24dp)

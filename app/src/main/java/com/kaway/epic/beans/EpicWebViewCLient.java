@@ -7,17 +7,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.kaway.epic.R;
 
 public class EpicWebViewCLient extends WebViewClient{
-
-    /*ConstraintLayout constraintLayout;
-
-    public EpicWebViewCLient(ConstraintLayout constraintLayout) {
-        this.constraintLayout = constraintLayout;
-    }*/
 
     Context context;
     ConstraintLayout rootLayout;
@@ -30,10 +22,6 @@ public class EpicWebViewCLient extends WebViewClient{
     @Override
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         super.doUpdateVisitedHistory(view, url, isReload);
-
-        // Example: Update the state of back and forward buttons
-        updateNavigationButtons(view);
-        //RecyclerView commentsView = constraintLayout.findViewById(R.id.commentsRecyclerView);
 
         if(!isReload && !url.contains("www.youtube.com/embed")){
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
@@ -57,9 +45,6 @@ public class EpicWebViewCLient extends WebViewClient{
             view.setLayoutParams(layoutParams);
         }
 
-        //view.setHei
-
-        System.out.println("something about the url changed "+url);
     }
 
     // Enable back navigation with WebView history
@@ -67,17 +52,6 @@ public class EpicWebViewCLient extends WebViewClient{
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         view.loadUrl(url);
         return true;
-    }
-
-    private void updateNavigationButtons(WebView myWebView) {
-        // Check if the WebView can go back or forward in the browsing history
-        boolean canGoBack = myWebView.canGoBack();
-        boolean canGoForward = myWebView.canGoForward();
-
-        // Here you would update the visibility or state of back/forward buttons
-        // For example:
-        // backButton.setEnabled(canGoBack);
-        // forwardButton.setEnabled(canGoForward);
     }
 
     @Override
