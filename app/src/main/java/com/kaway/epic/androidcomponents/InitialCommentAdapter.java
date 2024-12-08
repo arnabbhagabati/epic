@@ -56,6 +56,10 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
         View replyView = LayoutInflater.from(context).inflate(R.layout.view_replies, holder.repliesContainer, false);
         TextView viewMoreReplies = replyView.findViewById(R.id.viewMoreReplies);
 
+        if(comment.getReplies().isEmpty()){
+            viewMoreReplies.setVisibility(View.GONE);
+        }
+
 
         viewMoreReplies.setOnClickListener(new View.OnClickListener() {
             @Override

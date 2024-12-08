@@ -16,13 +16,14 @@ public class EpicConstants {
     public static final String VID_DATA_TABLE_NAME = "VidData";
     public static final String VID_DATA_TABLE_PK_COL = "vidId";
     public static final String VID_DATA_TABLE_VID_DATA_COL = "videoData";
-    
+
 
     public static String EPIC_TABLE_NAME  = "VID_ID_LIST";
 
     public static String EPIC_LOG_TAG  = "epic.log";
 
-    public static Set<String> DEFAULT_VID_ID_SET = Set.of("jzHVnptr4sc", "3U9P4-ac0Lc", "BOsm3I8jdlQ","bO7Os1Zu8Z4");
+    //public static Set<String> DEFAULT_VID_ID_SET = Set.of("jzHVnptr4sc", "3U9P4-ac0Lc", "BOsm3I8jdlQ","bO7Os1Zu8Z4","oXaJlpts_IY","plmPqfm2scA","2hh6b8RP3fc","wW3DCHZk-3M","qdjYw4zjLcg","dl8NjP2zVso");
+    public static Set<String> DEFAULT_VID_ID_SET = Set.of();
     public static String DEFAULT_VID_ID_SET_KEY = "VID_ID_SET_KEY";
 
 

@@ -41,8 +41,8 @@ public class VidListUtil {
             String nextVidSetKey = getNextVidSetKey(lastVidSetKey);
             op.addAll(EpicUtils.getJSONSetInSharedPrefs(context,nextVidSetKey));
 
-            if(op.isEmpty()){
-                loadVidSet(context,nextVidSetKey);
+            if(op.isEmpty() || op.size()<150){
+                loadVidSet(context,nextVidSetKey,op);
             }
             lastVidSetKey = nextVidSetKey;
             triesCount++;
@@ -74,11 +74,12 @@ public class VidListUtil {
         return nextVidSetKey;
     }
 
-    private void loadVidSet(Context context,String sharedPrefVidSetKey){
+    private void loadVidSet(Context context, String sharedPrefVidSetKey, Set<JSONObject> op){
         ExecutorService executorService = Executors.newFixedThreadPool(1);
             executorService.execute(() -> {
                 try {
-                    EpicUtils.setJSONSetInSharedPrefs(context,sharedPrefVidSetKey,new VidService(context).getVidSet());
+                    op.addAll(new VidService(context).getVidSet());
+                    EpicUtils.setJSONSetInSharedPrefs(context,sharedPrefVidSetKey,op);
                 } catch (Exception e) {
                     Log.e(EPIC_LOG_TAG, "loadVidSet - Cloud not vidSet ", e);
                 }

@@ -1,15 +1,11 @@
 package com.kaway.epic;
 
 import static com.kaway.epic.EpicConstants.*;
-
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,19 +18,16 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.EpicWebViewCLient;
-
 import com.kaway.epic.screenLayoutUtils.LoadComments;
 import com.kaway.epic.util.EpicUtils;
 import com.kaway.epic.util.VidListUtil;
-
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     ConstraintLayout rootLayout;
     JSONObject vidObj = null;
     private boolean showSpalsh = true;
+    private boolean loadInComplete = true;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -64,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
-        splashScreen.setKeepOnScreenCondition(() -> (showSpalsh || (vidObj == null) ));
+        splashScreen.setKeepOnScreenCondition(() -> (showSpalsh || loadInComplete ));
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             showSpalsh = false; // Update the condition
@@ -72,40 +66,32 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
-        webView = (WebView) findViewById(R.id.mediaPlayerView);
-        commentsView = findViewById(R.id.commentsRecyclerView);
-        rootLayout = findViewById(R.id.rootLayout);
-
-
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
             //This is first launch
             VidListUtil vidListUtil = new VidListUtil();
             vidListUtil.loadVidSetKeys(this,currVidSet);
             Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-            vidObj = EpicUtils.extractRandomJson(defaultVidSet);
             EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
+            while(currVidSet.isEmpty()){
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            vidObj = EpicUtils.extractRandomJson(currVidSet);
+            loadInComplete = false;
         }else{
             currVidSet = new VidListUtil().getNextVidSet(this);
-            if(!currVidSet.isEmpty()){
-                vidObj = EpicUtils.extractRandomJson(currVidSet);
-            }else{
-               Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
-               if(defaultVidSet.isEmpty()){
-                   Toast.makeText(this,"Could not find any more videos to show",Toast.LENGTH_LONG).show();
-               }else {
-                   vidObj = EpicUtils.extractRandomJson(defaultVidSet);
-                   EpicUtils.setJSONSetInSharedPrefs(this, DEFAULT_VID_ID_SET_KEY, defaultVidSet);
-               }
-            }
+            vidObj = EpicUtils.extractRandomJson(currVidSet);
+            loadInComplete = false;
         }
 
-        if(null == vidObj){
-            Toast.makeText(this,"- Could not retrieve videos -",Toast.LENGTH_LONG).show();
-            return;
-        }
+        setContentView(R.layout.activity_main);
+        webView = (WebView) findViewById(R.id.mediaPlayerView);
+        commentsView = findViewById(R.id.commentsRecyclerView);
+        rootLayout = findViewById(R.id.rootLayout);
 
-        Log.i(EPIC_LOG_TAG , "Showing vidid "+vidObj);
 
         if(savedInstanceState == null || savedInstanceState.isEmpty()){
             initializeWebView(vidObj);
@@ -261,14 +247,16 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void initializeWebView(JSONObject vidObj) {
-        String vidUrl = null;
+        String vidUrl = "";
         try {
-            vidUrl = EpicUtils.getEmbedUrl(vidObj.getString(VID_ID));
             webView.setWebChromeClient(new MyChrome());
             webView.setWebViewClient(new EpicWebViewCLient(this,rootLayout));
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setDomStorageEnabled(true);
+            if(vidObj != null && vidObj.has(VID_ID)){
+                vidUrl = EpicUtils.getEmbedUrl(vidObj.getString(VID_ID));
+            }
             webView.loadUrl(vidUrl);
             activityVidId = vidObj;
         } catch (JSONException e) {
@@ -278,11 +266,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initializeComments(JSONObject vidObj) {
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-
-        if(vidObj.has(COMMENTS_DATA)){
-
+        if(vidObj == null){
+            return;
         }else {
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
             try {
                 String vidId = vidObj.getString(VID_ID);
                 Future<List<Comment>> future = executorService.submit(new LoadComments(this, commentsView, vidId));
@@ -291,7 +278,6 @@ public class MainActivity extends AppCompatActivity {
                         // Get the result from the Callable
                         List<Comment> comments = future.get();
                         InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
-
                         runOnUiThread(() -> commentsView.setAdapter(adapter));
                     } catch (Exception e) {
                         Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
@@ -350,15 +336,17 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 String vidId = vidObject.getString(VID_ID);
-                ExecutorService executorService = Executors.newFixedThreadPool(1);
+                ExecutorService executorService = Executors.newFixedThreadPool(2);
                 Future<List<Comment>> future = executorService.submit(new LoadComments(this, commentsView, vidId));
                 executorService.execute(() -> {
                     try {
                         // Get the result from the Callable
                         List<Comment> comments = future.get();
                         InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
-
-                        runOnUiThread(() -> commentsView.setAdapter(adapter));
+                        this.runOnUiThread(() -> {
+                            commentsView.setAdapter(adapter);
+                            commentsView.requestLayout();
+                        });
                     } catch (Exception e) {
                         Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid" + vidId, e);
                     }
