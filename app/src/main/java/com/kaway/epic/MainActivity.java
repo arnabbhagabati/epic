@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         if(!EpicUtils.sharedfPrefContains(this,DEFAULT_VID_ID_SET_KEY) && !EpicUtils.sharedfPrefContains(this,RETRIEVED_VID_SET_SET_KEY)){
             //This is first launch
             VidListUtil vidListUtil = new VidListUtil();
-            vidListUtil.loadVidSetKeys(this,currVidSet);
+            vidListUtil.loadInstallVidSetKeys(this,currVidSet);
             Set<JSONObject> defaultVidSet = EpicUtils.getDefaultVidSet(this);
             EpicUtils.setJSONSetInSharedPrefs(this,DEFAULT_VID_ID_SET_KEY,defaultVidSet);
             while(currVidSet.isEmpty()){
@@ -372,7 +372,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void writeCurrVidSetToSharedPref(){
         String lastVidSetKey = EpicUtils.getStringInSharedPrefs(this,LAST_VID_SET_KEY_IDX);
-        EpicUtils.setJSONSetInSharedPrefs(this,lastVidSetKey,currVidSet);
+        if(lastVidSetKey != null && !lastVidSetKey.isEmpty() && lastVidSetKey.length()>1){
+            EpicUtils.setJSONSetInSharedPrefs(this,lastVidSetKey,currVidSet);
+        }else{
+            Set<JSONObject> vids = EpicUtils.getJSONSetInSharedPrefs(this,VID_KEY_3);
+            vids.addAll(currVidSet);
+            EpicUtils.setJSONSetInSharedPrefs(this,VID_KEY_3,vids);
+        }
+
         Log.i(EPIC_LOG_TAG,"currVidSet saved");
     }
 

@@ -87,9 +87,9 @@ public class VidListUtil {
         executorService.shutdown();
     }
 
-    public void loadVidSetKeys(Context context, Set<JSONObject> currVidSet){
+    public void loadInstallVidSetKeys(Context context, Set<JSONObject> currVidSet){
         ExecutorService executorService = Executors.newFixedThreadPool(1);
-        LoadVidSets loadVidSets = new LoadVidSets(context,currVidSet);
+        LoadInstallVidSets loadVidSets = new LoadInstallVidSets(context,currVidSet);
         executorService.submit(loadVidSets);
         executorService.shutdown();
     }
