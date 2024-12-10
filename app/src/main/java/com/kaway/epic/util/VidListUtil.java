@@ -41,7 +41,7 @@ public class VidListUtil {
             String nextVidSetKey = getNextVidSetKey(lastVidSetKey);
             op.addAll(EpicUtils.getJSONSetInSharedPrefs(context,nextVidSetKey));
 
-            if(op.isEmpty() || op.size()<150){
+            if(op.isEmpty() || op.size()<200){
                 loadVidSet(context,nextVidSetKey,op);
             }
             lastVidSetKey = nextVidSetKey;
