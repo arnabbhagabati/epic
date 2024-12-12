@@ -1,4 +1,4 @@
-package com.kaway.epic.beans;
+package com.kaway.epic.androidcomponents;
 
 import android.content.Context;
 import android.content.res.Configuration;

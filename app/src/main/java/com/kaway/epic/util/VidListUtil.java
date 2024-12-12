@@ -10,6 +10,7 @@ import com.kaway.epic.ytservice.VidService;
 import org.json.JSONObject;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,23 +55,10 @@ public class VidListUtil {
 
     private String getNextVidSetKey(String prevVidSetKey){
         String nextVidSetKey = "";
-        switch(prevVidSetKey){
-            case VID_KEY_0:
-                nextVidSetKey =VID_KEY_1;
-                break;
-            case VID_KEY_1:
-                nextVidSetKey = VID_KEY_2;
-                break;
-            case VID_KEY_2:
-                nextVidSetKey = VID_KEY_3;
-                break;
-            case VID_KEY_3:
-                nextVidSetKey = VID_KEY_0;
-                break;
-            default:
-                nextVidSetKey = VID_KEY_0;
-                break;
-        }
+        Set<String> vidSetKeys = new HashSet<>(Set.of(VID_KEY_0,VID_KEY_1,VID_KEY_2,VID_KEY_3));
+        vidSetKeys.remove(prevVidSetKey);
+        nextVidSetKey= vidSetKeys.stream().skip(new Random().nextInt(vidSetKeys.size())).findFirst().orElse(null);
+
         return nextVidSetKey;
     }
 

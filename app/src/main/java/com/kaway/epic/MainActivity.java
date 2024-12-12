@@ -20,14 +20,13 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;
-import com.kaway.epic.beans.EpicWebViewCLient;
+import com.kaway.epic.androidcomponents.EpicWebViewCLient;
 import com.kaway.epic.screenLayoutUtils.LoadComments;
 import com.kaway.epic.util.EpicUtils;
 import com.kaway.epic.util.VidListUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
