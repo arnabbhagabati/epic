@@ -49,11 +49,7 @@ public class LoadInstallVidSets implements Runnable {
             int vidSetRowCnt = Integer.parseInt(zeroSet.get(0));
             VidService vidService = new VidService(context);
 
-            Set<JSONObject> firstSet = new HashSet<>();
-            firstSet.addAll(vidService.getVidSet(vidSetRowCnt));
-            firstSet.addAll(vidService.getVidSet(vidSetRowCnt));
-            firstSet.addAll(vidService.getVidSet(vidSetRowCnt));
-            currVidSet.addAll(firstSet);
+            currVidSet.addAll(vidService.getVidSet(vidSetRowCnt));
 
             EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_0, vidService.getVidSet(vidSetRowCnt));
             EpicUtils.setJSONSetInSharedPrefs(context, VID_KEY_1, vidService.getVidSet(vidSetRowCnt));
