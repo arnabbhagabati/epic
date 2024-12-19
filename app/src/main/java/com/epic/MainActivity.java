@@ -1,6 +1,6 @@
-package com.kaway.epic;
+package com.epic;
 
-import static com.kaway.epic.EpicConstants.*;
+import static com.epic.EpicConstants.*;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,12 +18,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import com.kaway.epic.androidcomponents.InitialCommentAdapter;
-import com.kaway.epic.beans.Comment;
-import com.kaway.epic.androidcomponents.EpicWebViewCLient;
-import com.kaway.epic.screenLayoutUtils.LoadComments;
-import com.kaway.epic.util.EpicUtils;
-import com.kaway.epic.util.VidListUtil;
+import com.epic.androidcomponents.InitialCommentAdapter;
+import com.epic.beans.Comment;
+import com.epic.androidcomponents.EpicWebViewCLient;
+import com.epic.screenLayoutUtils.LoadComments;
+import com.epic.util.EpicUtils;
+import com.epic.util.VidListUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 

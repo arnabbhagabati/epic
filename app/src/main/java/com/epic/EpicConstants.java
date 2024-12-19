@@ -1,7 +1,5 @@
-package com.kaway.epic;
+package com.epic;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class EpicConstants {

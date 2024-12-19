@@ -1,14 +1,13 @@
-package com.kaway.epic.util;
+package com.epic.util;
 
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
-import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.kaway.epic.EpicConstants.VID_ID;
+import static com.epic.EpicConstants.DEFAULT_VID_ID_SET;
+import static com.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
+import static com.epic.EpicConstants.EPIC_LOG_TAG;
+import static com.epic.EpicConstants.VID_ID;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import android.app.Activity;
@@ -16,17 +15,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.kaway.epic.EpicConstants;
-import com.kaway.epic.MainActivity;
+import com.epic.EpicConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;

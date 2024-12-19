@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.kaway.epic'
+    namespace 'com.epic'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.kaway.epic"
+        applicationId "com.epic"
         minSdk 29
         targetSdk 35
         versionCode 2

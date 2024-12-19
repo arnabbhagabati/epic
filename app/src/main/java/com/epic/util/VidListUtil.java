@@ -1,11 +1,11 @@
-package com.kaway.epic.util;
+package com.epic.util;
 
-import static com.kaway.epic.EpicConstants.*;
+import static com.epic.EpicConstants.*;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.kaway.epic.ytservice.VidService;
+import com.epic.ytservice.VidService;
 
 import org.json.JSONObject;
 

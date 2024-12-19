@@ -1,8 +1,8 @@
-package com.kaway.epic.db;
+package com.epic.db;
 
 
-import static com.kaway.epic.EpicConstants.VID_ID_LIST_TABLE_NAME;
-import static com.kaway.epic.EpicConstants.VID_ID_LIST_TABLE_PK_COL;
+import static com.epic.EpicConstants.VID_ID_LIST_TABLE_NAME;
+import static com.epic.EpicConstants.VID_ID_LIST_TABLE_PK_COL;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;

@@ -1,4 +1,4 @@
-package com.kaway.epic.beans;
+package com.epic.beans;
 
 import java.util.List;
 
