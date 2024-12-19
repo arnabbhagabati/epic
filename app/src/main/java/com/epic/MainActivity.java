@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         // Get the result from the Callable
                         List<Comment> comments = future.get();
-                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments,webView);
                         runOnUiThread(() -> commentsView.setAdapter(adapter));
                     } catch (Exception e) {
                         Log.e(EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
@@ -341,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         // Get the result from the Callable
                         List<Comment> comments = future.get();
-                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments);
+                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments,webView);
                         this.runOnUiThread(() -> {
                             commentsView.setAdapter(adapter);
                             commentsView.requestLayout();
