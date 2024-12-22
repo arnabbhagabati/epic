@@ -8,6 +8,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.epic.db.VidDetailsDao;
+import com.epic.db.VidIdSetCurDao;
 import com.epic.db.VidIdSetDao;
 import com.epic.util.EpicUtils;
 
@@ -34,7 +35,7 @@ public class VidService  {
     public Set<JSONObject> getVidSet(){
         Set<JSONObject> vidSet = new HashSet<>();
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        VidIdSetDao vidIdSetDao = new VidIdSetDao("0");
+        VidIdSetCurDao vidIdSetDao = new VidIdSetCurDao("0");
         Future<List<String>> zeroSetFuture = executorService.submit(vidIdSetDao);
         List<String> zeroSet = null;
         try {

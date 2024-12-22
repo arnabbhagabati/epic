@@ -8,6 +8,7 @@ import static com.epic.EpicConstants.VID_KEY_2;
 import android.content.Context;
 import android.util.Log;
 
+import com.epic.db.VidIdSetCurDao;
 import com.epic.db.VidIdSetDao;
 import com.epic.ytservice.VidService;
 
@@ -34,7 +35,7 @@ public class LoadInstallVidSets implements Runnable {
     public void run() {
 
         ExecutorService executorService = Executors.newFixedThreadPool(1);
-        VidIdSetDao vidIdSetDao = new VidIdSetDao("0");
+        VidIdSetCurDao vidIdSetDao = new VidIdSetCurDao("0");
         Future<List<String>> zeroSetFuture = executorService.submit(vidIdSetDao);
         List<String> zeroSet = null;
         try {
