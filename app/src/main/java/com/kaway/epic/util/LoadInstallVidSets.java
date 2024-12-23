@@ -1,16 +1,15 @@
-package com.epic.util;
+package com.kaway.epic.util;
 
-import static com.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.epic.EpicConstants.VID_KEY_0;
-import static com.epic.EpicConstants.VID_KEY_1;
-import static com.epic.EpicConstants.VID_KEY_2;
+import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
+import static com.kaway.epic.EpicConstants.VID_KEY_0;
+import static com.kaway.epic.EpicConstants.VID_KEY_1;
+import static com.kaway.epic.EpicConstants.VID_KEY_2;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.epic.db.VidIdSetCurDao;
-import com.epic.db.VidIdSetDao;
-import com.epic.ytservice.VidService;
+import com.kaway.epic.db.VidIdSetCurDao;
+import com.kaway.epic.ytservice.VidService;
 
 import org.json.JSONObject;
 

@@ -1,4 +1,4 @@
-package com.epic.db;
+package com.kaway.epic.db;
 
 import static com.amazonaws.regions.Regions.US_WEST_2;
 

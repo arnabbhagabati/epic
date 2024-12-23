@@ -1,4 +1,4 @@
-package com.epic;
+package com.kaway.epic;
 
 import java.util.Set;
 

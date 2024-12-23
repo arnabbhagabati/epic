@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.epic",
+  "applicationId": "com.kaway.epic",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 2,
-      "versionName": "1.4",
+      "versionCode": 4,
+      "versionName": "1.7",
       "outputFile": "app-release.apk"
     }
   ],

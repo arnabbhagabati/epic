@@ -1,4 +1,4 @@
-package com.epic.androidcomponents;
+package com.kaway.epic.androidcomponents;
 
 import android.content.Context;
 import android.text.SpannableString;
@@ -19,11 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.epic.beans.Comment;
-import com.epic.beans.Reply;
+import com.kaway.epic.beans.Comment;
+import com.kaway.epic.beans.Reply;
 
 import java.util.List;
-import com.epic.R;
+import com.kaway.epic.R;
 
 public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentAdapter.CommentViewHolder>{
 

@@ -1,9 +1,9 @@
-package com.epic.util;
+package com.kaway.epic.util;
 
-import static com.epic.EpicConstants.DEFAULT_VID_ID_SET;
-import static com.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
-import static com.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.epic.EpicConstants.VID_ID;
+import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
+import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
+import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
+import static com.kaway.epic.EpicConstants.VID_ID;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.epic.EpicConstants;
+import com.kaway.epic.EpicConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;

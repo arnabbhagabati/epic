@@ -1,10 +1,10 @@
-package com.epic.db;
+package com.kaway.epic.db;
 
 
-import static com.epic.EpicConstants.EPIC_TABLE_NAME;
-import static com.epic.db.EpicDb.SHOWN_COL;
-import static com.epic.db.EpicDb.VID_LIST_COL;
-import static com.epic.db.EpicDb.VID_LIST_ID_COL;
+import static com.kaway.epic.EpicConstants.EPIC_TABLE_NAME;
+import static com.kaway.epic.db.EpicDb.SHOWN_COL;
+import static com.kaway.epic.db.EpicDb.VID_LIST_COL;
+import static com.kaway.epic.db.EpicDb.VID_LIST_ID_COL;
 
 import android.content.ContentValues;
 import android.content.Context;

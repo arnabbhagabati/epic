@@ -1,4 +1,4 @@
-package com.epic.screenLayoutUtils;
+package com.kaway.epic.screenLayoutUtils;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,11 +6,11 @@ import android.util.Log;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.epic.EpicConstants;
-import com.epic.beans.Comment;
-import com.epic.beans.Reply;
-import com.epic.util.EpicUtils;
-import com.epic.ytservice.VidService;
+import com.kaway.epic.EpicConstants;
+import com.kaway.epic.beans.Comment;
+import com.kaway.epic.beans.Reply;
+import com.kaway.epic.util.EpicUtils;
+import com.kaway.epic.ytservice.VidService;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,4 +1,4 @@
-package com.epic.beans;
+package com.kaway.epic.beans;
 
 public class Reply {
     private int id;

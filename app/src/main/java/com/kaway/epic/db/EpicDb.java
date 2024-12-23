@@ -1,7 +1,7 @@
-package com.epic.db;
+package com.kaway.epic.db;
 
-import static com.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.epic.EpicConstants.EPIC_TABLE_NAME;
+import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
+import static com.kaway.epic.EpicConstants.EPIC_TABLE_NAME;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

@@ -1,6 +1,6 @@
-package com.epic.db;
+package com.kaway.epic.db;
 
-import static com.epic.EpicConstants.*;
+import static com.kaway.epic.EpicConstants.*;
 
 import android.util.Log;
 
@@ -8,7 +8,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
-import com.epic.EpicConstants;
+import com.kaway.epic.EpicConstants;
 
 import java.util.HashMap;
 import java.util.Map;

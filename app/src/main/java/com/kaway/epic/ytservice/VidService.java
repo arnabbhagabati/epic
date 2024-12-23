@@ -1,16 +1,16 @@
-package com.epic.ytservice;
+package com.kaway.epic.ytservice;
 
-import static com.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
-import static com.epic.EpicConstants.VID_ID;
+import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
+import static com.kaway.epic.EpicConstants.RETRIEVED_VID_SET_SET_KEY;
+import static com.kaway.epic.EpicConstants.VID_ID;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.epic.db.VidDetailsDao;
-import com.epic.db.VidIdSetCurDao;
-import com.epic.db.VidIdSetDao;
-import com.epic.util.EpicUtils;
+import com.kaway.epic.db.VidDetailsDao;
+import com.kaway.epic.db.VidIdSetCurDao;
+import com.kaway.epic.db.VidIdSetDao;
+import com.kaway.epic.util.EpicUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

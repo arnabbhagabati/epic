@@ -1,7 +1,8 @@
-package com.epic.db;
+package com.kaway.epic.db;
 
-import static com.epic.EpicConstants.VID_ID_LIST_TABLE_NAME;
-import static com.epic.EpicConstants.VID_ID_LIST_TABLE_PK_COL;
+
+import static com.kaway.epic.EpicConstants.VID_ID_LIST_TABLE_NAME;
+import static com.kaway.epic.EpicConstants.VID_ID_LIST_TABLE_PK_COL;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
@@ -13,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class VidIdSetCurDao implements Callable<List<String>> {
+public class VidIdSetDao implements Callable<List<String>> {
 
     String val;
 
-    public VidIdSetCurDao(String val) {
+    public VidIdSetDao(String val) {
         this.val = val;
     }
     String tblSuffix = "a0c57119";
@@ -41,9 +42,9 @@ public class VidIdSetCurDao implements Callable<List<String>> {
         GetItemResult result = dbClient.getItem(request);
 
         Map<String, AttributeValue> resultMap = result.getItem();
-        AttributeValue vidIdsAttr = resultMap.get("filterConfig");
-        String curatedVidIdCount = vidIdsAttr.getS();
+        AttributeValue vidIdsAttr = resultMap.get("vidSet");
+        List<String> vidIds = vidIdsAttr.getSS();
 
-        return List.of(curatedVidIdCount);
+        return vidIds;
     }
 }
