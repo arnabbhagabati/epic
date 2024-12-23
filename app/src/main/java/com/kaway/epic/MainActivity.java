@@ -1,6 +1,8 @@
 package com.kaway.epic;
 
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.splashscreen.SplashScreen;
@@ -182,23 +184,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-         /*
-        Use this code intstead of OnBackPressed later.
-        Right now this makes back press very low and hangy
+
+        //Use this code intstead of OnBackPressed later.
+        //Right now this makes back press very slow and hangy
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (webView.canGoBack()) {
                     webView.goBack();
                 } else {
-                    getOnBackPressedDispatcher().onBackPressed();
+                    finish();
                 }
             }
         };
-        getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);*/
+        getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);
 
     }
 
+    /*
     @Override
     public void onBackPressed() {
         // Check if WebView has back history
@@ -207,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
-    }
+    }*/
 
 
     private class MyChrome extends WebChromeClient {
