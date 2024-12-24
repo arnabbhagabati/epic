@@ -15,6 +15,8 @@ public class EpicConstants {
     public static final String VID_DATA_TABLE_PK_COL = "vidId";
     public static final String VID_DATA_TABLE_VID_DATA_COL = "videoData";
 
+    public static String VID_TITLE_KEY  = "Title";
+
 
     public static String EPIC_TABLE_NAME  = "VID_ID_LIST";
 

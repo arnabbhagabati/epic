@@ -18,10 +18,12 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.androidcomponents.EpicWebViewCLient;
+import com.kaway.epic.beans.Vid;
 import com.kaway.epic.screenLayoutUtils.LoadComments;
 import com.kaway.epic.util.EpicUtils;
 import com.kaway.epic.util.VidListUtil;
@@ -30,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     JSONObject vidObj = null;
     private boolean showSpalsh = true;
     private boolean loadInComplete = true;
+
+    private TextView titleView;
+    private String vidTitle = "";
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -92,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
         webView = (WebView) findViewById(R.id.mediaPlayerView);
         commentsView = findViewById(R.id.commentsRecyclerView);
         rootLayout = findViewById(R.id.rootLayout);
+        titleView = findViewById(R.id.videoTitle);
+        titleView.setText(vidTitle);
 
 
         if(savedInstanceState == null || savedInstanceState.isEmpty()){
@@ -274,13 +280,17 @@ public class MainActivity extends AppCompatActivity {
             ExecutorService executorService = Executors.newFixedThreadPool(2);
             try {
                 String vidId = vidObj.getString(EpicConstants.VID_ID);
-                Future<List<Comment>> future = executorService.submit(new LoadComments(this, commentsView, vidId));
+                Future<Vid> future = executorService.submit(new LoadComments(this, commentsView, vidId));
                 executorService.execute(() -> {
                     try {
                         // Get the result from the Callable
-                        List<Comment> comments = future.get();
-                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments,webView);
-                        runOnUiThread(() -> commentsView.setAdapter(adapter));
+                        Vid vid = future.get();
+                        vidTitle = vid.getTitle();
+                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, vid.getComments(),webView);
+                        runOnUiThread(() -> {
+                            titleView.setText(vidTitle);
+                            commentsView.setAdapter(adapter);
+                        });
                     } catch (Exception e) {
                         Log.e(EpicConstants.EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
                     }
@@ -332,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void reloadCommentsView(JSONObject vidObject) {
         commentsView.setAdapter(null);
+        titleView.setText("");
         if(vidObject.has(EpicConstants.COMMENTS_DATA)){
 
         }else {
@@ -339,13 +350,14 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String vidId = vidObject.getString(EpicConstants.VID_ID);
                 ExecutorService executorService = Executors.newFixedThreadPool(2);
-                Future<List<Comment>> future = executorService.submit(new LoadComments(this, commentsView, vidId));
+                Future<Vid> future = executorService.submit(new LoadComments(this, commentsView, vidId));
                 executorService.execute(() -> {
                     try {
-                        // Get the result from the Callable
-                        List<Comment> comments = future.get();
-                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, comments,webView);
+                        Vid vid = future.get();
+                        vidTitle = vid.getTitle();
+                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, vid.getComments(),webView);
                         this.runOnUiThread(() -> {
+                            titleView.setText(vidTitle);
                             commentsView.setAdapter(adapter);
                             commentsView.requestLayout();
                         });
