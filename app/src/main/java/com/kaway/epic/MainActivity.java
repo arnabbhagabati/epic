@@ -165,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
 
                             // Get the parent's dimensions
                             View parent = (View) rootLayout.getParent();
-                            float thresholdX = parent.getWidth() * 0.15f; // 20% of width
-                            float thresholdY = parent.getHeight() * 0.15f; // 20% of height
+                            float thresholdX = parent.getWidth() * 0.1f; // 20% of width
+                            float thresholdY = parent.getHeight() * 0.1f; // 20% of height
 
                             // Snap back if the movement is less than 20% of the parent's dimensions
                             if (deltaX < thresholdX && deltaY < thresholdY) {
