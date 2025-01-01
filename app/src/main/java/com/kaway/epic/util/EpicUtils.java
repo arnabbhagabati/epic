@@ -1,19 +1,23 @@
 package com.kaway.epic.util;
 
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET;
-import static com.kaway.epic.EpicConstants.DEFAULT_VID_ID_SET_KEY;
-import static com.kaway.epic.EpicConstants.EPIC_LOG_TAG;
-import static com.kaway.epic.EpicConstants.VID_ID;
+import static com.kaway.epic.EpicConstants.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.kaway.epic.EpicConstants;
 import com.kaway.epic.beans.Comment;
@@ -27,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -189,11 +194,105 @@ public class EpicUtils {
                     repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate,replyLikes));
                 }
                 comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate,likes));
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
             }
         }
         return comments;
+    }
+
+    public void showRateMeDialog(Context context){
+        if(sharedfPrefContains(context, SET_RATE_APP_REQ_DATE)){
+            String dateStr = getStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+            LocalDate parsedDate = LocalDate.parse(dateStr, formatter);
+            LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
+
+            LocalDate tempDate = parsedDate.minusDays(11);
+
+            if (!tempDate.isBefore(tenDaysAgo)) {
+                return;
+            }else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Rate Our App")
+                        .setMessage("If you enjoy using this app, would you mind taking a moment to rate it? Thank you for your support!")
+                        .setPositiveButton("Rate Now", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Open Play Store
+                                openPlayStore(context);
+                            }
+                        })
+                        .setNeutralButton("Later", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Dismiss the dialog
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Never", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                String formattedDate = "01-01-2099";
+                                setStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE,formattedDate);
+
+                                dialog.dismiss();
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+
+                LocalDate currentDate = LocalDate.now();
+                String formattedDate = currentDate.format(formatter);
+                setStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE,formattedDate);
+
+                dialog.show();
+            }
+        }else{
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+            String formattedDate = currentDate.format(formatter);
+            setStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE,formattedDate);
+        }
+
+    }
+
+    public void openPlayStore(Context context) {
+        String packageName = MAIN_PACKAGE_NAME;
+        try {
+            // Open Play Store app
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=" + packageName)));
+        } catch (android.content.ActivityNotFoundException e) {
+            // Fallback to browser if Play Store is not available
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)));
+        }
+    }
+
+
+    public static void setCurrVidSetInSharedPrefs(Set<JSONObject> currVidSet, String vidSetKey,Context context){
+       Set<JSONObject> storedVidObjects =  EpicUtils.getJSONSetInSharedPrefs(context,vidSetKey);
+       Set<String> currVidSetIds = new HashSet<>();
+        try {
+           for(JSONObject currSetJsonObj : currVidSet){
+               currVidSetIds.add(currSetJsonObj.getString(VID_ID));
+           }
+           Iterator<JSONObject> itr = storedVidObjects.iterator();
+           while(itr.hasNext()){
+               JSONObject vidObj = itr.next();
+               if(!currVidSetIds.contains(vidObj.getString(VID_ID))){
+                   itr.remove();
+               }
+           }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        EpicUtils.setJSONSetInSharedPrefs(context,vidSetKey,storedVidObjects);
+
     }
 
 

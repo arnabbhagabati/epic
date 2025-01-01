@@ -1,12 +1,13 @@
 package com.kaway.epic;
 
-import static com.kaway.epic.EpicConstants.COMMENTS_DATA;
-import static com.kaway.epic.EpicConstants.PRE_LOAD_COMMENTS_WORKER_TAG;
-import static com.kaway.epic.EpicConstants.VID_TITLE_KEY;
 
+import static com.kaway.epic.EpicConstants.*;
+
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.splashscreen.SplashScreen;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView titleView;
     private String vidTitle = "";
+    private int reloadCount =0;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -218,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         };
         getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);
 
-        OneTimeWorkRequest preLoadComments = new OneTimeWorkRequest.Builder(PreLoadComments.class).build();
+        OneTimeWorkRequest preLoadComments = new OneTimeWorkRequest.Builder(PreLoadComments.class).addTag(PRE_LOAD_COMMENTS_WORKER_TAG).build();
         WorkManager.getInstance(this).enqueueUniqueWork(PRE_LOAD_COMMENTS_WORKER_TAG,ExistingWorkPolicy.KEEP,preLoadComments);
     }
 
@@ -365,10 +367,16 @@ public class MainActivity extends AppCompatActivity {
         try {
             if(vidObject.has(EpicConstants.VID_DATA)){
                 JSONObject vidData = vidObject.getJSONObject(EpicConstants.VID_DATA);
-                vidTitle = vidData.getString(VID_TITLE_KEY);
-                JSONArray commentsData = vidData.getJSONArray(COMMENTS_DATA);
-                comments = new EpicUtils().getCommentListFromJsonArray(commentsData);
-                if(comments != null && !comments.isEmpty()){
+                if(vidData.has(VID_TITLE_KEY)){
+                    vidTitle = vidData.getString(VID_TITLE_KEY);
+                }
+
+                if(vidData.has(COMMENTS_DATA)){
+                    JSONArray commentsData = vidData.getJSONArray(COMMENTS_DATA);
+                    comments = new EpicUtils().getCommentListFromJsonArray(commentsData);
+                }
+
+                if(comments != null && !comments.isEmpty() && vidTitle.length()>1 ){
                     commentsFound = true;
                 }
             }
@@ -403,6 +411,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+
+        reloadCount++;
+        if(reloadCount%8==0){
+            new EpicUtils().showRateMeDialog(this);
+        }
     }
 
     @Override
@@ -420,14 +433,16 @@ public class MainActivity extends AppCompatActivity {
     private void writeCurrVidSetToSharedPref(){
         String lastVidSetKey = EpicUtils.getStringInSharedPrefs(this, EpicConstants.LAST_VID_SET_KEY_IDX);
         if(lastVidSetKey != null && !lastVidSetKey.isEmpty() && lastVidSetKey.length()>1){
-            EpicUtils.setJSONSetInSharedPrefs(this,lastVidSetKey,currVidSet);
+            EpicUtils.setCurrVidSetInSharedPrefs(currVidSet,lastVidSetKey,this);
         }else{
             Set<JSONObject> vids = EpicUtils.getJSONSetInSharedPrefs(this, EpicConstants.VID_KEY_3);
             vids.addAll(currVidSet);
-            EpicUtils.setJSONSetInSharedPrefs(this, EpicConstants.VID_KEY_3,vids);
+            EpicUtils.setCurrVidSetInSharedPrefs(currVidSet,VID_KEY_3,this);
         }
-
         Log.i(EpicConstants.EPIC_LOG_TAG,"currVidSet saved");
     }
+
+
+
 
 }

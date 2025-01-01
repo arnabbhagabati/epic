@@ -45,5 +45,9 @@ public class EpicConstants {
 
     public static String PRE_LOAD_COMMENTS_WORKER_TAG = "preLOadWorkerTag";
 
+    public static String MAIN_PACKAGE_NAME = "com.kaway.epic";
 
+    public static String SET_RATE_APP_REQ_DATE = "rateReqDate";
+
+    public static String DEFAULT_DATE_FORMAT = "dd-MM-yyyy";
 }
