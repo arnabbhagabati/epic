@@ -5,7 +5,8 @@ import java.util.Set;
 public class EpicConstants {
 
     public static final String VID_ID = "vidId";
-    public static final String COMMENTS_DATA = "cmntsData";
+    public static final String VID_DATA = "vidData";
+    public static final String COMMENTS_DATA = "commentsData";
 
     public static final String VID_ID_LIST_TABLE_PK_COL = "id";
     public static final String VID_ID_LIST_TABLE_VID_SET_COL = "vidSet";
@@ -23,7 +24,7 @@ public class EpicConstants {
     public static String EPIC_LOG_TAG  = "epic.log";
 
     //public static Set<String> DEFAULT_VID_ID_SET = Set.of("jzHVnptr4sc", "3U9P4-ac0Lc", "BOsm3I8jdlQ","bO7Os1Zu8Z4","oXaJlpts_IY","plmPqfm2scA","2hh6b8RP3fc","wW3DCHZk-3M","qdjYw4zjLcg","dl8NjP2zVso");
-    public static Set<String> DEFAULT_VID_ID_SET = Set.of();
+    public static Set<String> DEFAULT_VID_ID_SET = Set.of("jzHVnptr4sc");
     public static String DEFAULT_VID_ID_SET_KEY = "VID_ID_SET_KEY";
 
 
@@ -39,6 +40,10 @@ public class EpicConstants {
     public static String FIRST_VIDSET_ID_KEY = "FIRST_VIDSET_ID_KEY";
 
     public static String RETRIEVED_VID_SET_SET_KEY = "RETRIEVED_VID_SET_SET";
+
+    public static int MIN_STORED_VID_SET_SIZE = 140;
+
+    public static String PRE_LOAD_COMMENTS_WORKER_TAG = "preLOadWorkerTag";
 
 
 }

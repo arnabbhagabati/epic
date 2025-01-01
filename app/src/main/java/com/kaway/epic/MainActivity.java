@@ -1,5 +1,9 @@
 package com.kaway.epic;
 
+import static com.kaway.epic.EpicConstants.COMMENTS_DATA;
+import static com.kaway.epic.EpicConstants.PRE_LOAD_COMMENTS_WORKER_TAG;
+import static com.kaway.epic.EpicConstants.VID_TITLE_KEY;
+
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -7,6 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,17 +31,20 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
-import com.kaway.epic.beans.Comment;
 import com.kaway.epic.androidcomponents.EpicWebViewCLient;
+import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Vid;
 import com.kaway.epic.screenLayoutUtils.LoadComments;
 import com.kaway.epic.util.EpicUtils;
+import com.kaway.epic.util.PreLoadComments;
 import com.kaway.epic.util.VidListUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -205,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
         };
         getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);
 
+        OneTimeWorkRequest preLoadComments = new OneTimeWorkRequest.Builder(PreLoadComments.class).build();
+        WorkManager.getInstance(this).enqueueUniqueWork(PRE_LOAD_COMMENTS_WORKER_TAG,ExistingWorkPolicy.KEEP,preLoadComments);
     }
 
     /*
@@ -274,32 +289,34 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initializeComments(JSONObject vidObj) {
-        if(vidObj == null){
-            return;
-        }else {
-            ExecutorService executorService = Executors.newFixedThreadPool(2);
-            try {
-                String vidId = vidObj.getString(EpicConstants.VID_ID);
-                Future<Vid> future = executorService.submit(new LoadComments(this, commentsView, vidId));
-                executorService.execute(() -> {
-                    try {
-                        // Get the result from the Callable
-                        Vid vid = future.get();
-                        vidTitle = vid.getTitle();
-                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, vid.getComments(),webView);
-                        runOnUiThread(() -> {
-                            titleView.setText(vidTitle);
-                            commentsView.setAdapter(adapter);
-                        });
-                    } catch (Exception e) {
-                        Log.e(EpicConstants.EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
-                    }
-                });
-                //new ShowComments(this).showInitialComments(recyclerView,vidId);
-                executorService.shutdown();
-            } catch (JSONException e) {
-                Log.e(EpicConstants.EPIC_LOG_TAG,"JSON Error in initializeRecyclerView", e);
+        commentsView.setAdapter(null);
+        boolean commentsFound =  false;
+        List<Comment> comments = null;
+        try {
+            if(vidObj == null){
+                return;
+            }else {
+                    ExecutorService executorService = Executors.newFixedThreadPool(2);
+                    String vidId = vidObj.getString(EpicConstants.VID_ID);
+                    Future<Vid> future = executorService.submit(new LoadComments(this, commentsView, vidId));
+                    executorService.execute(() -> {
+                        try {
+                            Vid vid = future.get();
+                            vidTitle = vid.getTitle();
+                            InitialCommentAdapter adapter = new InitialCommentAdapter(this, vid.getComments(), webView);
+                            runOnUiThread(() -> {
+                                titleView.setText(vidTitle);
+                                commentsView.setAdapter(adapter);
+                            });
+                        } catch (Exception e) {
+                            Log.e(EpicConstants.EPIC_LOG_TAG, "Cloud not load comments for vid " + vidId, e);
+                        }
+                    });
+                    //new ShowComments(this).showInitialComments(recyclerView,vidId);
+                    executorService.shutdown();
             }
+        } catch (JSONException e) {
+            Log.e(EpicConstants.EPIC_LOG_TAG,"JSON Error in initializeRecyclerView", e);
         }
     }
 
@@ -343,32 +360,48 @@ public class MainActivity extends AppCompatActivity {
     private void reloadCommentsView(JSONObject vidObject) {
         commentsView.setAdapter(null);
         titleView.setText("");
-        if(vidObject.has(EpicConstants.COMMENTS_DATA)){
-
-        }else {
-
-            try {
-                String vidId = vidObject.getString(EpicConstants.VID_ID);
-                ExecutorService executorService = Executors.newFixedThreadPool(2);
-                Future<Vid> future = executorService.submit(new LoadComments(this, commentsView, vidId));
-                executorService.execute(() -> {
-                    try {
-                        Vid vid = future.get();
-                        vidTitle = vid.getTitle();
-                        InitialCommentAdapter adapter = new InitialCommentAdapter(this, vid.getComments(),webView);
-                        this.runOnUiThread(() -> {
-                            titleView.setText(vidTitle);
-                            commentsView.setAdapter(adapter);
-                            commentsView.requestLayout();
-                        });
-                    } catch (Exception e) {
-                        Log.e(EpicConstants.EPIC_LOG_TAG, "Cloud not load comments for vid" + vidId, e);
-                    }
-                });
-                executorService.shutdown();
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+        boolean commentsFound =  false;
+        List<Comment> comments = null;
+        try {
+            if(vidObject.has(EpicConstants.VID_DATA)){
+                JSONObject vidData = vidObject.getJSONObject(EpicConstants.VID_DATA);
+                vidTitle = vidData.getString(VID_TITLE_KEY);
+                JSONArray commentsData = vidData.getJSONArray(COMMENTS_DATA);
+                comments = new EpicUtils().getCommentListFromJsonArray(commentsData);
+                if(comments != null && !comments.isEmpty()){
+                    commentsFound = true;
+                }
             }
+            if(commentsFound){
+                InitialCommentAdapter adapter = new InitialCommentAdapter(this,comments,webView);
+                this.runOnUiThread(() -> {
+                    titleView.setText(vidTitle);
+                    commentsView.setAdapter(adapter);
+                    commentsView.requestLayout();
+                });
+            }else {
+                    String vidId = vidObject.getString(EpicConstants.VID_ID);
+                    ExecutorService executorService = Executors.newFixedThreadPool(2);
+                    Future<Vid> future = executorService.submit(new LoadComments(this, commentsView, vidId));
+                    executorService.execute(() -> {
+                        try {
+                            Vid vid = future.get();
+                            vidTitle = vid.getTitle();
+                            InitialCommentAdapter adapter = new InitialCommentAdapter(this, vid.getComments(),webView);
+                            this.runOnUiThread(() -> {
+                                titleView.setText(vidTitle);
+                                commentsView.setAdapter(adapter);
+                                commentsView.requestLayout();
+                            });
+                        } catch (Exception e) {
+                            Log.e(EpicConstants.EPIC_LOG_TAG, "Cloud not load comments for vid" + vidId, e);
+                        }
+                    });
+                    executorService.shutdown();
+
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
     }
 

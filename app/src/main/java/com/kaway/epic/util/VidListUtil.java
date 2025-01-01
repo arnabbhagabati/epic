@@ -25,13 +25,12 @@ public class VidListUtil {
             EpicUtils.setStringInSharedPrefs(context,LAST_VID_SET_KEY_IDX,VID_KEY_0);
         }
 
-        Set<JSONObject> vids0 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_0);
-        Set<JSONObject> vids11 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_1);
-        Set<JSONObject> vids22 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_2);
-        Set<JSONObject> vids3 = EpicUtils.getJSONSetInSharedPrefs(context,VID_KEY_3);
+        Set<JSONObject> lastSetData = new HashSet<>(EpicUtils.getJSONSetInSharedPrefs(context,lastVidSetKey));
+        if(lastSetData.size()<MIN_STORED_VID_SET_SIZE){
+            loadVidSet(context,lastVidSetKey,lastSetData);
+        }
 
         Set<JSONObject> op = new HashSet<>();
-
         int triesCount = 0;
 
         while(op.isEmpty()){
@@ -42,12 +41,15 @@ public class VidListUtil {
             String nextVidSetKey = getNextVidSetKey(lastVidSetKey);
             op.addAll(EpicUtils.getJSONSetInSharedPrefs(context,nextVidSetKey));
 
-            if(op.isEmpty() || op.size()<200){
-                loadVidSet(context,nextVidSetKey,op);
-            }
             lastVidSetKey = nextVidSetKey;
             triesCount++;
         }
+
+        if(op.isEmpty()){
+            op.addAll(new VidService(context).getVidSet());
+            EpicUtils.setJSONSetInSharedPrefs(context,lastVidSetKey,op);
+        }
+
         EpicUtils.setStringInSharedPrefs(context,LAST_VID_SET_KEY_IDX,lastVidSetKey);
 
         return op;

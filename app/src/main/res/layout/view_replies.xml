@@ -13,5 +13,6 @@
         android:textColor="@android:color/holo_blue_light"
         android:textStyle="bold"
         android:clickable="true"
+        android:textSize="@dimen/comment_text_size"
         android:onClick="onViewMoreRepliesClick" />
 </LinearLayout>
