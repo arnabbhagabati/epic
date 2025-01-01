@@ -209,9 +209,7 @@ public class EpicUtils {
             LocalDate parsedDate = LocalDate.parse(dateStr, formatter);
             LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
 
-            LocalDate tempDate = parsedDate.minusDays(11);
-
-            if (!tempDate.isBefore(tenDaysAgo)) {
+            if (!parsedDate.isBefore(tenDaysAgo)) {
                 return;
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
