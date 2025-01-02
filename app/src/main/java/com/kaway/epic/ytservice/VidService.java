@@ -7,6 +7,7 @@ import static com.kaway.epic.EpicConstants.VID_ID;
 import android.content.Context;
 import android.util.Log;
 
+import com.kaway.epic.db.BatchVidDetailsDao;
 import com.kaway.epic.db.VidDetailsDao;
 import com.kaway.epic.db.VidIdSetCurDao;
 import com.kaway.epic.db.VidIdSetDao;
@@ -15,8 +16,10 @@ import com.kaway.epic.util.EpicUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -153,6 +156,22 @@ public class VidService  {
         }
         executorService.shutdown();
         return op;
+    }
+
+    public Map<String,JSONObject> getBatchVidData(Set<String> vidIds){
+
+        Map<String,JSONObject> vidDataMap = new HashMap<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        BatchVidDetailsDao vidDetailsDao = new BatchVidDetailsDao(vidIds);
+        Future<Map<String,JSONObject>> vidDetailsFuture = executorService.submit(vidDetailsDao);
+
+        try {
+            vidDataMap = vidDetailsFuture.get();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(EPIC_LOG_TAG,"Error retrieving the vid data in getBatchVidData ", e);
+        }
+        executorService.shutdown();
+        return vidDataMap;
     }
 
 }
