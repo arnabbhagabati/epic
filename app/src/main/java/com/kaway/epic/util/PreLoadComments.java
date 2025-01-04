@@ -56,6 +56,10 @@ public class PreLoadComments extends Worker {
                 }catch (JSONException e) {
                     Log.e(EpicConstants.EPIC_LOG_TAG, "PreLoadComments Cloud not retrieve a vidId" , e);
                 }
+
+                if(vidDvidIdSet.size() > 80){
+                    break;
+                }
             }
 
             Map<String,JSONObject> vidDataMap = new VidService(context).getBatchVidData(vidDvidIdSet);
