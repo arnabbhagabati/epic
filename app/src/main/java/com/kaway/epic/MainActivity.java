@@ -116,6 +116,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(savedInstanceState == null || savedInstanceState.isEmpty()){
+            /*try {
+                JSONObject vidObjTmp = new JSONObject();
+                vidObjTmp.put(VID_ID,"ESg_Yz4vSMU");
+                initializeWebView(vidObjTmp);
+                initializeComments(vidObjTmp);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }*/
             initializeWebView(vidObj);
             initializeComments(vidObj);
         }else{
