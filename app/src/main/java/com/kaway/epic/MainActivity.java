@@ -3,6 +3,7 @@ package com.kaway.epic;
 
 import static com.kaway.epic.EpicConstants.*;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -31,6 +32,13 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.play.core.review.ReviewException;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.review.model.ReviewErrorCode;
 import com.kaway.epic.androidcomponents.InitialCommentAdapter;
 import com.kaway.epic.androidcomponents.EpicWebViewCLient;
 import com.kaway.epic.beans.Comment;
@@ -44,6 +52,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView titleView;
     private String vidTitle = "";
     private int reloadCount =0;
+
+    private ReviewManager reviewManager;
 
     String frameVideo = "<iframe src=\"https://www.youtube.com/embed/UqHh6TvGQIQ\" title=\"This is a title\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
     String frame2 = "<iframe id=\"video\" src=\"https://www.youtube.com/embed/54zE3WRyxBc?rel=0&autoplay=1\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" mozallowfullscreen=\"mozallowfullscreen\" msallowfullscreen=\"msallowfullscreen\" oallowfullscreen=\"oallowfullscreen\" webkitallowfullscreen=\"webkitallowfullscreen\"></iframe>";
@@ -227,6 +239,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);
+
+        reviewManager = ReviewManagerFactory.create(this);
 
         OneTimeWorkRequest preLoadComments = new OneTimeWorkRequest.Builder(PreLoadComments.class).addTag(PRE_LOAD_COMMENTS_WORKER_TAG).build();
         WorkManager.getInstance(this).enqueueUniqueWork(PRE_LOAD_COMMENTS_WORKER_TAG,ExistingWorkPolicy.KEEP,preLoadComments);
@@ -421,8 +435,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         reloadCount++;
-        if(reloadCount%8==0){
-            new EpicUtils().showRateMeDialog(this);
+        if(reloadCount%7==0){
+            showRateMeDialog();
         }
     }
 
@@ -451,6 +465,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void showRateMeDialog(){
+        if(EpicUtils.sharedfPrefContains(this, SET_RATE_APP_REQ_DATE)){
+            String dateStr = EpicUtils.getStringInSharedPrefs(this,SET_RATE_APP_REQ_DATE);
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+            LocalDate parsedDate = LocalDate.parse(dateStr, formatter);
+            LocalDate daysAgo = LocalDate.now().minusDays(4);
+
+            if (!parsedDate.isBefore(daysAgo)) {
+                return;
+            }else{
+                Task <ReviewInfo> request = reviewManager.requestReviewFlow();
+                request.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Getting the ReviewInfo object
+                        ReviewInfo reviewInfo = task.getResult();
+                        Log.i(EpicConstants.EPIC_LOG_TAG,"showing rate me dialog");
+                        Task <Void> flow = reviewManager.launchReviewFlow(this, reviewInfo);
+                        flow.addOnCompleteListener(task1 -> {
+                            Log.i(EpicConstants.EPIC_LOG_TAG,"rate me dialog show attempted");
+                        });
+                    }
+                });
+            }
+        }else{
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+            String formattedDate = currentDate.format(formatter);
+            EpicUtils.setStringInSharedPrefs(this,SET_RATE_APP_REQ_DATE,formattedDate);
+        }
+
+    }
 
 }
