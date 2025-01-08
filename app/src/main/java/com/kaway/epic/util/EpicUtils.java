@@ -106,6 +106,10 @@ public class EpicUtils {
         return"https://www.youtube.com/embed/"+vidId+"?rel=0&autoplay=1";
     }
 
+    public static String getEmbedUrlAtTime(String vidId,int time){
+        return"https://www.youtube.com/embed/"+vidId+"?rel=0&autoplay=1&start="+time;
+    }
+
 
     public static Set<JSONObject> getDefaultVidSet(Context context){
         if(sharedfPrefContains(context,DEFAULT_VID_ID_SET_KEY)){
@@ -207,9 +211,9 @@ public class EpicUtils {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
             LocalDate parsedDate = LocalDate.parse(dateStr, formatter);
-            LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
+            LocalDate daysAgo = LocalDate.now().minusDays(4);
 
-            if (!parsedDate.isBefore(tenDaysAgo)) {
+            if (!parsedDate.isBefore(daysAgo)) {
                 return;
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
