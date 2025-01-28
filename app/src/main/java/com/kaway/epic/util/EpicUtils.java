@@ -22,22 +22,18 @@ import androidx.appcompat.app.AlertDialog;
 import com.kaway.epic.EpicConstants;
 import com.kaway.epic.beans.Comment;
 import com.kaway.epic.beans.Reply;
-import com.kaway.epic.beans.Vid;
-import com.kaway.epic.screenLayoutUtils.LoadComments;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class EpicUtils {
@@ -193,11 +189,12 @@ public class EpicUtils {
                     String replyAuthFull = reply.getString("author").substring(1);
                     String replyAuth = (replyAuthFull != null && !replyAuthFull.isEmpty()) ? reply.getString("author").substring(1) : "";
                     String replierIcon = reply.getString("authorProfileImgUrl");
-                    String replyDate = "  "+EpicUtils.getTimeElapsed(reply.getString("commentDate"));
+                    String replyDate = reply.getString("commentDate");
                     String replyLikes = EpicUtils.formatNumberToCompact(Long.parseLong(reply.getString("likes")));
                     repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate,replyLikes));
                 }
-                comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate,likes));
+                List<Reply> processedReplies = sortAndProcessDateInReplies(repliesList);
+                comments.add(new Comment(i,author,commentText,processedReplies,profileIconUrl,commentDate,likes));
             } catch (Exception e) {
                 Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
             }
@@ -294,6 +291,30 @@ public class EpicUtils {
         }
 
         EpicUtils.setJSONSetInSharedPrefs(context,vidSetKey,storedVidObjects);
+
+    }
+
+
+    public  static List<Reply> sortAndProcessDateInReplies(List<Reply> repliesList){
+
+        List<Reply> sortedReplies = repliesList.stream().sorted(new Comparator<Reply>() {
+            @Override
+            public int compare(Reply o1, Reply o2) {
+                Instant instant1 = Instant.parse(o1.getReplyDate());
+                LocalDateTime inputTime1 = LocalDateTime.ofInstant(instant1, ZoneId.of("UTC"));
+
+                Instant instant2 = Instant.parse(o2.getReplyDate());
+                LocalDateTime inputTime2 = LocalDateTime.ofInstant(instant2, ZoneId.of("UTC"));
+                return inputTime1.compareTo(inputTime2);
+            }
+        }).collect(Collectors.toList());
+
+        for(Reply reply : sortedReplies){
+            String elapsedDate = "  "+EpicUtils.getTimeElapsed(reply.getReplyDate());
+            reply.setReplyDate(elapsedDate);
+        }
+
+        return sortedReplies;
 
     }
 

@@ -148,7 +148,7 @@ public class InitialCommentAdapter  extends RecyclerView.Adapter<InitialCommentA
             webView.loadUrl("https://www.youtube.com/@"+reply.getAuthor());
         });
 
-        if(reply.getText().contains("@@")) {
+        if(!reply.getText().isEmpty() && reply.getText().length()>3 && reply.getText().contains("@@")) {
             String fullText = reply.getText();
             int startIdx =  reply.getText().indexOf("@@")+2;
             int endIdx = reply.getText().indexOf(" ",startIdx);

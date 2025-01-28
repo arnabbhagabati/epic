@@ -40,4 +40,8 @@ public class Reply {
     public String getLikeCount() {
         return likeCount;
     }
+
+    public void setReplyDate(String replyDate) {
+        this.replyDate = replyDate;
+    }
 }

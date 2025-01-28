@@ -1,6 +1,7 @@
 package com.kaway.epic.screenLayoutUtils;
 
 import static com.kaway.epic.EpicConstants.VID_TITLE_KEY;
+import static com.kaway.epic.util.EpicUtils.sortAndProcessDateInReplies;
 
 import android.content.Context;
 import android.util.Log;
@@ -35,7 +36,7 @@ public class LoadComments implements Callable<Vid> {
         this.vidId = vidId;
     }
 
-    public Vid showInitialComments(){
+    public Vid processComments(){
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         List<Comment> comments = new ArrayList<>();
@@ -61,11 +62,12 @@ public class LoadComments implements Callable<Vid> {
                         String replyAuthFull = reply.getString("author").substring(1);
                         String replyAuth = (replyAuthFull != null && !replyAuthFull.isEmpty()) ? reply.getString("author").substring(1) : "";
                         String replierIcon = reply.getString("authorProfileImgUrl");
-                        String replyDate = "  "+EpicUtils.getTimeElapsed(reply.getString("commentDate"));
+                        String replyDate = reply.getString("commentDate");
                         String replyLikes = EpicUtils.formatNumberToCompact(Long.parseLong(reply.getString("likes")));
                         repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate,replyLikes));
                     }
-                    comments.add(new Comment(i,author,commentText,repliesList,profileIconUrl,commentDate,likes));
+                    List<Reply> processedReplies = sortAndProcessDateInReplies(repliesList);
+                    comments.add(new Comment(i,author,commentText,processedReplies,profileIconUrl,commentDate,likes));
                 } catch (JSONException e) {
                     Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
                 }
@@ -85,6 +87,6 @@ public class LoadComments implements Callable<Vid> {
 
     @Override
     public Vid call() throws Exception {
-        return showInitialComments();
+        return processComments();
     }
 }
