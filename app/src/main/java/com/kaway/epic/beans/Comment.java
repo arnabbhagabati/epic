@@ -8,11 +8,23 @@ public class Comment {
     private String text;
     private List<Reply> replies;
 
-    public Comment(int id, String author, String text, List<Reply> replies) {
+    private String profileIconUrl;
+    private String commentDate;
+    private String likeCount;
+
+    public Comment(int id, String author,
+                            String text,
+                            List<Reply> replies,
+                            String profileIconUrl,
+                            String commentDate,
+                            String likeCount) {
         this.id = id;
         this.author = author;
         this.text = text;
         this.replies = replies;
+        this.profileIconUrl = profileIconUrl;
+        this.commentDate = commentDate;
+        this.likeCount = likeCount;
     }
 
     public int getId() {
@@ -29,6 +41,17 @@ public class Comment {
 
     public List<Reply> getReplies() {
         return replies;
+    }
+
+    public String getProfileIconUrl() {
+        return profileIconUrl;
+    }
+
+    public String getCommentDate() {
+        return commentDate;
+    }
+    public String getLikeCount() {
+        return likeCount;
     }
 }
 
