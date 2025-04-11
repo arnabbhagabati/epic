@@ -1,4 +1,4 @@
-package com.kaway.epic;
+package com.epic;
 
 import org.junit.Test;
 

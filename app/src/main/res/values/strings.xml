@@ -1,4 +1,10 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Epic</string>
     <string name="comments">Comments</string>
+    commenter_icon
+    <string name="commenter_icon">Commenter icon</string>
+    <string name="long_comment">Lorem Ipsum</string>
+    <string name="view_replies">View replies</string>
+    <string name="hide_replies">Hide replies</string>
+    <string name="thumbs_up_icon">thumbs up icon\n</string>
 </resources>

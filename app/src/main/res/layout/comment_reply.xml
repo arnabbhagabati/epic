@@ -1,20 +1,101 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@android:color/transparent">
 
-    <TextView
-        android:id="@+id/reply_author"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="Reply Author" />
+    <!-- Profile Icon with 4dp padding on top -->
+    <ImageView
+        android:id="@+id/replyProfileIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top"
+        android:src="@drawable/person_24dp"
+        android:contentDescription="@string/commenter_icon"
+        android:scaleType="centerCrop"
+        android:background="@drawable/circular_background"
+        android:backgroundTint="@color/white"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp" />
 
-    <TextView
-        android:id="@+id/reply_text"
-        android:layout_width="wrap_content"
+    <!-- Name and Comment Text -->
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Reply text here" />
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+        <!-- Commenter's Name (Split into Two TextViews) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/replierName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Replier Name"
+                android:textColor="@android:color/holo_blue_light"
+                android:textStyle="bold"
+                android:textSize="@dimen/comment_text_size"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/replyTimeElapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="normal"
+                android:textSize="@dimen/small_comment_text_size"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <!-- Comment Text -->
+        <TextView
+            android:id="@+id/replyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/long_comment"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/comment_text_size"
+            android:layout_marginTop="4dp"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- New Likes TextView -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/replyLikesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:layout_marginEnd="4dp"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="@dimen/small_comment_text_size" />
+
+            <ImageView
+                android:id="@+id/replyThumbsUpIcon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/thumb_up_24px"
+                android:contentDescription="@string/thumbs_up_icon"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="2dp"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

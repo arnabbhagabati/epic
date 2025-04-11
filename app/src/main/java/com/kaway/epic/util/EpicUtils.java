@@ -1,0 +1,322 @@
+package com.kaway.epic.util;
+
+import static com.kaway.epic.EpicConstants.*;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.kaway.epic.EpicConstants;
+import com.kaway.epic.beans.Comment;
+import com.kaway.epic.beans.Reply;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class EpicUtils {
+
+    public static void setStringInSharedPrefs(Context context, String key, String value){
+        SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key,value);
+        editor.apply();
+    }
+
+    public static String getStringInSharedPrefs(Context context, String key){
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        return sharedPref.getString(key, "");
+    }
+
+    public static void setJSONSetInSharedPrefs(Context context, String key, Set<JSONObject> value) {
+        SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        Set<String> jsonSetStr = new HashSet<>(value.stream().map(o -> o.toString()).collect(Collectors.toSet()));
+        editor.putStringSet(key,jsonSetStr);
+        editor.apply();
+    }
+
+    public static Set<JSONObject> getJSONSetInSharedPrefs(Context context, String key) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        Set<String> jsonSetStr = sharedPref.getStringSet(key, new HashSet<String>());
+        Set<JSONObject> vidJsonSet = jsonSetStr.stream().map(o -> {
+            JSONObject op = null;
+            try {
+                op = new JSONObject(o);
+            } catch (JSONException e) {
+                Log.e(EPIC_LOG_TAG,"Error creating json while retrieving the vidList from sharedPrefs", e);
+            }
+            return op;
+        }).collect(Collectors.toSet());
+
+        return vidJsonSet;
+    }
+
+    public static void setSetInSharedPrefs(Context context, String key, Set<String> value) {
+        SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putStringSet(key,value);
+        editor.apply();
+    }
+
+    public static Set<String> getSetInSharedPrefs(Context context, String key) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        return sharedPref.getStringSet(key, new HashSet<String>());
+    }
+
+    public static boolean sharedfPrefContains(Context context, String key){
+        SharedPreferences preferences = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        return preferences.contains(key);
+    }
+
+    public static JSONObject extractRandomJson(Set<JSONObject> stringSet){
+        JSONObject randomJson = stringSet.stream().skip(new Random().nextInt(stringSet.size())).findFirst().orElse(null);
+        stringSet.remove(randomJson);
+        return randomJson;
+    }
+
+
+    public static String getEmbedUrl(String vidId){
+        return"https://www.youtube.com/embed/"+vidId+"?rel=0&autoplay=1";
+    }
+
+    public static String getEmbedUrlAtTime(String vidId,int time){
+        return"https://www.youtube.com/embed/"+vidId+"?rel=0&autoplay=1&start="+time;
+    }
+
+
+    public static Set<JSONObject> getDefaultVidSet(Context context){
+        if(sharedfPrefContains(context,DEFAULT_VID_ID_SET_KEY)){
+            return new HashSet<>(getJSONSetInSharedPrefs(context,DEFAULT_VID_ID_SET_KEY));
+        }else{
+            Set<JSONObject> vidIdSet = new HashSet<>();
+            for(String vId : DEFAULT_VID_ID_SET){
+                try {
+                    vidIdSet.add(new JSONObject().put(VID_ID,vId));
+                } catch (JSONException e) {
+                    Log.e(EPIC_LOG_TAG,"Error creating json in getDefaultVidSet", e);
+                }
+            }
+            setJSONSetInSharedPrefs(context,DEFAULT_VID_ID_SET_KEY, vidIdSet);
+            return vidIdSet;
+        }
+    }
+
+    public static String getTimeElapsed(String utcDateString) {
+        try {
+            // Parse the input date string
+            Instant instant = Instant.parse(utcDateString);
+            LocalDateTime inputTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+            LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC")); // Current UTC time
+
+            // Calculate the time difference
+            long years = ChronoUnit.YEARS.between(inputTime, now);
+            if (years > 0) return years + " year" + (years > 1 ? "s" : "") + " ago";
+
+            long months = ChronoUnit.MONTHS.between(inputTime, now);
+            if (months > 0) return months + " month" + (months > 1 ? "s" : "") + " ago";
+
+            long days = ChronoUnit.DAYS.between(inputTime, now);
+            if (days > 0) return days + " day" + (days > 1 ? "s" : "") + " ago";
+
+            long hours = ChronoUnit.HOURS.between(inputTime, now);
+            if (hours > 0) return hours + " hour" + (hours > 1 ? "s" : "") + " ago";
+
+            long minutes = ChronoUnit.MINUTES.between(inputTime, now);
+            if (minutes > 0) return minutes + " minute" + (minutes > 1 ? "s" : "") + " ago";
+
+            long seconds = ChronoUnit.SECONDS.between(inputTime, now);
+            if (seconds > 0) return seconds + " second" + (seconds > 1 ? "s" : "") + " ago";
+
+            return "just now";
+        } catch (Exception e) {
+            Log.e(EpicConstants.EPIC_LOG_TAG,"Error formatting date",e);
+            return "";
+        }
+    }
+
+
+    public static String formatNumberToCompact(long number) {
+        if (number < 1000) {
+            return String.valueOf(number); // No conversion needed
+        } else if (number < 1_000_000) {
+            return String.format("%.1fK", number / 1000.0);
+        } else if (number < 1_000_000_000) {
+            return String.format("%.1fM", number / 1_000_000.0);
+        } else {
+            return String.format("%.1fB", number / 1_000_000_000.0);
+        }
+    }
+
+
+    public List<Comment> getCommentListFromJsonArray(JSONArray commentsArray){
+        List<Comment> comments = new ArrayList<>();
+        for(int i=0;i<commentsArray.length();i++){
+            try {
+                JSONObject comment = new JSONObject(String.valueOf(commentsArray.get(i)));
+                String author = comment.getString("author").substring(1);
+                String commentText = comment.getString("commentText");
+                JSONArray replies = comment.getJSONArray("replies");
+                String profileIconUrl = comment.getString("authorProfileImgUrl");
+                String commentDate = "  "+EpicUtils.getTimeElapsed(comment.getString("commentDate"));
+                String likes = EpicUtils.formatNumberToCompact(Long.parseLong(comment.getString("likes")));
+                List<Reply> repliesList = new ArrayList<>();
+                for(int j=0;j<replies.length();j++){
+                    JSONObject reply = new JSONObject(replies.getString(j));
+                    String replyText = reply.getString("replyText");
+                    String replyAuthFull = reply.getString("author").substring(1);
+                    String replyAuth = (replyAuthFull != null && !replyAuthFull.isEmpty()) ? reply.getString("author").substring(1) : "";
+                    String replierIcon = reply.getString("authorProfileImgUrl");
+                    String replyDate = reply.getString("commentDate");
+                    String replyLikes = EpicUtils.formatNumberToCompact(Long.parseLong(reply.getString("likes")));
+                    repliesList.add(new Reply(j,replyAuth,replyText,replierIcon,replyDate,replyLikes));
+                }
+                List<Reply> processedReplies = sortAndProcessDateInReplies(repliesList);
+                comments.add(new Comment(i,author,commentText,processedReplies,profileIconUrl,commentDate,likes));
+            } catch (Exception e) {
+                Log.e(EpicConstants.EPIC_LOG_TAG,"error parsing vidData comment",e);
+            }
+        }
+        return comments;
+    }
+
+    public void showRateMeDialog(Context context){
+        if(sharedfPrefContains(context, SET_RATE_APP_REQ_DATE)){
+            String dateStr = getStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+            LocalDate parsedDate = LocalDate.parse(dateStr, formatter);
+            LocalDate daysAgo = LocalDate.now().minusDays(4);
+
+            if (!parsedDate.isBefore(daysAgo)) {
+                return;
+            }else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Rate Our App")
+                        .setMessage("If you enjoy using this app, would you mind taking a moment to rate it? Thank you for your support!")
+                        .setPositiveButton("Rate Now", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Open Play Store
+                                openPlayStore(context);
+                            }
+                        })
+                        .setNeutralButton("Later", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Dismiss the dialog
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Never", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                String formattedDate = "01-01-2099";
+                                setStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE,formattedDate);
+
+                                dialog.dismiss();
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+
+                LocalDate currentDate = LocalDate.now();
+                String formattedDate = currentDate.format(formatter);
+                setStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE,formattedDate);
+
+                dialog.show();
+            }
+        }else{
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+            String formattedDate = currentDate.format(formatter);
+            setStringInSharedPrefs(context,SET_RATE_APP_REQ_DATE,formattedDate);
+        }
+
+    }
+
+    public void openPlayStore(Context context) {
+        String packageName = MAIN_PACKAGE_NAME;
+        try {
+            // Open Play Store app
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=" + packageName)));
+        } catch (android.content.ActivityNotFoundException e) {
+            // Fallback to browser if Play Store is not available
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)));
+        }
+    }
+
+
+    public static void setCurrVidSetInSharedPrefs(Set<JSONObject> currVidSet, String vidSetKey,Context context){
+       Set<JSONObject> storedVidObjects =  EpicUtils.getJSONSetInSharedPrefs(context,vidSetKey);
+       Set<String> currVidSetIds = new HashSet<>();
+        try {
+           for(JSONObject currSetJsonObj : currVidSet){
+               currVidSetIds.add(currSetJsonObj.getString(VID_ID));
+           }
+           Iterator<JSONObject> itr = storedVidObjects.iterator();
+           while(itr.hasNext()){
+               JSONObject vidObj = itr.next();
+               if(!currVidSetIds.contains(vidObj.getString(VID_ID))){
+                   itr.remove();
+               }
+           }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        EpicUtils.setJSONSetInSharedPrefs(context,vidSetKey,storedVidObjects);
+
+    }
+
+
+    public  static List<Reply> sortAndProcessDateInReplies(List<Reply> repliesList){
+
+        List<Reply> sortedReplies = repliesList.stream().sorted(new Comparator<Reply>() {
+            @Override
+            public int compare(Reply o1, Reply o2) {
+                Instant instant1 = Instant.parse(o1.getReplyDate());
+                LocalDateTime inputTime1 = LocalDateTime.ofInstant(instant1, ZoneId.of("UTC"));
+
+                Instant instant2 = Instant.parse(o2.getReplyDate());
+                LocalDateTime inputTime2 = LocalDateTime.ofInstant(instant2, ZoneId.of("UTC"));
+                return inputTime1.compareTo(inputTime2);
+            }
+        }).collect(Collectors.toList());
+
+        for(Reply reply : sortedReplies){
+            String elapsedDate = "  "+EpicUtils.getTimeElapsed(reply.getReplyDate());
+            reply.setReplyDate(elapsedDate);
+        }
+
+        return sortedReplies;
+
+    }
+
+
+}

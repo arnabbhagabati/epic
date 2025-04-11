@@ -1,38 +1,48 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/custom_dark_gray">
 
-    <!-- WebView taking 40% of screen height -->
     <WebView
         android:id="@+id/mediaPlayerView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@android:color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="400dp" />
+        app:layout_constraintHeight_percent="0.60" />
 
-    <!-- Comments header TextView -->
     <TextView
-        android:id="@+id/commentsHeader"
-        android:layout_width="wrap_content"
+        android:id="@+id/videoTitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/comments"
-        android:textSize="18sp"
+        android:text=""
+        android:textSize="@dimen/vid_title_text_size"
+        android:textColor="@android:color/white"
         android:textStyle="bold"
-        android:padding="5dp"
+        android:gravity="start"
+        android:background="@color/black"
         app:layout_constraintTop_toBottomOf="@id/mediaPlayerView"
-        app:layout_constraintStart_toStartOf="parent" /> <!-- Left alignment -->
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/commentsRecyclerView"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
 
-    <!-- RecyclerView taking 50% of screen height -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
+        android:id="@+id/commentsRecyclerView"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/commentsHeader"
-        app:layout_constraintHeight_percent="0.5" />
+        android:background="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/videoTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

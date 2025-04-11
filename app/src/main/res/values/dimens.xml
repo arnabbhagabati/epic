@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="comment_text_size">14sp</dimen>
+    <dimen name="small_comment_text_size">12sp</dimen>
+    <dimen name="vid_title_text_size">18sp</dimen>
+</resources>
